@@ -41,8 +41,8 @@ const Style = styled.nav<{ mode: "main" | "light" | "dark" }>`
   }
 `;
 
-function Breadcrumb(): JSX.Element {
-  const loaderData = useLoaderData();
+function Breadcrumb(props: any): JSX.Element {
+  const loaderData = useLoaderData() as any;
 
   function renderBreadcrumb(separator?: string | JSX.Element) {
     const { breadcrumb: data }: any = loaderData;
@@ -89,10 +89,6 @@ function Breadcrumb(): JSX.Element {
       );
     }
   }
-
-  // useMemo(() => {
-  //   console.log(loaderData);
-  // }, [loaderData]);
 
   return <nav>{renderBreadcrumb(React.createElement("p", {}, "/"))}</nav>;
 }

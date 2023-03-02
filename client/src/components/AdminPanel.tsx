@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useCallback } from "react";
 import styled from "styled-components";
+import useAccount from "../hooks/useAccount";
 
 const Style = styled.section<{ mode: "main" | "light" | "dark" }>`
   display: flex;
@@ -35,8 +36,9 @@ const Card = styled.div<{ color?: string; width?: string; height?: string }>`
   }
 `;
 
-function AdminPanel(): JSX.Element {
-  return (
+function AdminPanel(): JSX.Element | null {
+  const { user } = useAccount();
+  return user?.admin ? (
     <Style mode="main">
       <Card width="15rem">
         <p>Usuários: 20/30</p>
@@ -59,7 +61,7 @@ function AdminPanel(): JSX.Element {
       <Card width="15rem">c</Card>
       <Card width="15rem">d</Card>
     </Style>
-  );
+  ) : null;
 }
 
 export default AdminPanel;

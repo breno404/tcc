@@ -1,3 +1,4 @@
+import React, { useEffect, useState } from "react";
 import AdminPanel from "../components/AdminPanel";
 import Breadcrumb from "../components/Breadcrumb";
 
@@ -11,9 +12,7 @@ function Home() {
           border: "2px solid black",
           borderRadius: "1.2rem",
         }}
-      >
-        aaa
-      </div>
+      ></div>
     </>
   );
 }
