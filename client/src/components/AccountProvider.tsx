@@ -1,4 +1,4 @@
-import AccountContext from "../contexts/accountContext";
+import AccountContext from "@/contexts/accountContext";
 
 type AccountProviderProps = {
   account: {
