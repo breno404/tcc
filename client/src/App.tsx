@@ -7,14 +7,14 @@ import router from "./router";
 
 function App() {
   return (
-    //<React.StrictMode>
-    <CookiesProvider>
-      <Theme>
-        <RouterProvider router={router} />
-      </Theme>
-      <GlobalStyle />
-    </CookiesProvider>
-    //</React.StrictMode>
+    <React.StrictMode>
+      <CookiesProvider>
+        <Theme>
+          <RouterProvider router={router} />
+        </Theme>
+        <GlobalStyle />
+      </CookiesProvider>
+    </React.StrictMode>
   );
 }
 

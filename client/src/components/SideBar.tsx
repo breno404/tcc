@@ -12,8 +12,6 @@ const Style = styled.aside<{ mode: "main" | "light" | "dark" }>`
   color: ${({ theme, mode }: any) => theme[mode].secondary.textColor};
 `;
 
-//type sideBarProps = {};
-
 function SideBar(): React.ReactElement {
   const theme = useTheme();
   const { user } = useAccount();

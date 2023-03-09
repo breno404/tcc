@@ -1,15 +1,12 @@
-import React, { useEffect, useRef, useState } from "react";
+import React from "react";
 import AdminPanel from "@/components/AdminPanel";
 import Breadcrumb from "@/components/Breadcrumb";
-import PieChart from "@/components/PieChart";
-import DoughnutChart from "@/components/DoughnutChart";
-import AreaChart from "@/components/AreaChart";
+import PieChart from "@/components/charts/PieChart";
+import DoughnutChart from "@/components/charts/DoughnutChart";
+import AreaChart from "@/components/charts/RadarChart";
 import SimpleMap from "@/components/GoogleMaps";
-import useWindowSize from "@/hooks/useWindowSize";
 
 function Home() {
-  const { width, height } = useWindowSize();
-
   return (
     <>
       <Breadcrumb />
@@ -18,13 +15,29 @@ function Home() {
         style={{
           display: "flex",
           flexWrap: "wrap",
+          padding: "2rem",
+          justifyContent: "center",
           border: "2px solid black",
           borderRadius: "1.2rem",
         }}
       >
-        <PieChart />
-        <DoughnutChart />
-        <AreaChart />
+        <div
+          style={{
+            width: "100%",
+            display: "flex",
+            flexWrap: "wrap",
+            justifyContent: "center",
+            alignItems: "center",
+            paddingBottom: "2rem",
+            paddingRight: "2rem",
+            flexShrink: 1,
+          }}
+        >
+          <PieChart />
+          <DoughnutChart />
+          <AreaChart />
+        </div>
+
         <SimpleMap />
       </div>
     </>

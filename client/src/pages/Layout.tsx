@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { useCookies } from "react-cookie";
 import { Outlet } from "react-router-dom";
-import AccountProvider from "@/components/AccountProvider";
+import AccountProvider from "@/components/providers/AccountProvider";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import Main from "@/components/Main";
