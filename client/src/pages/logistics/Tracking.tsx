@@ -1,16 +1,20 @@
-import React from "react";
-import AdminPanel from "@/components/AdminPanel";
 import Breadcrumb from "@/components/Breadcrumb";
-import PieChart from "@/components/charts/PieChart";
-import DoughnutChart from "@/components/charts/DoughnutChart";
-import AreaChart from "@/components/charts/RadarChart";
 import GoogleMap from "@/components/map/GoogleMap";
+import styled from "styled-components";
 
-function Home() {
+const Style = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  background-color: #fff;
+`;
+
+function Tracking() {
   return (
     <>
       <Breadcrumb />
-      <AdminPanel />
       <div
         style={{
           display: "flex",
@@ -21,25 +25,23 @@ function Home() {
           borderRadius: "1.2rem",
         }}
       >
+        <div style={{ width: "100%", height: "20rem", color: "#000" }}>
+          aaaaaaa
+        </div>
         <div
           style={{
             width: "100%",
+            height: "100%",
             display: "flex",
-            flexWrap: "wrap",
             justifyContent: "center",
             alignItems: "center",
-            paddingBottom: "2rem",
-            paddingRight: "2rem",
-            flexShrink: 1,
           }}
         >
-          <PieChart />
-          <DoughnutChart />
-          <AreaChart />
+          <GoogleMap width="100%" height="600px" />
         </div>
       </div>
     </>
   );
 }
 
-export default Home;
+export default Tracking;
