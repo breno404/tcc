@@ -12,7 +12,6 @@ const Style = styled.section<{ mode: "main" | "light" | "dark" }>`
   background-color: ${({ theme, mode }: any) =>
     theme[mode].white.backgroundColor};
   color: #000000;
-  border: 1px solid black;
   padding-right: 1.5rem;
   padding-bottom: 1.5rem;
 `;
@@ -36,8 +35,9 @@ const Card = styled.div<{ color?: string; width?: string; height?: string }>`
   overflow: hidden;
 
   border-radius: 2rem;
+  box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
 
-  background-color: ${({ color }) => (color ? color : "#3d08ff")};
+  background-color: ${({ color }) => (color ? color : "#fff")};
 
   display: flex;
   flex-grow: 1;
@@ -73,27 +73,43 @@ const Cards = memo(({ info }: { info: CardProps[] }): JSX.Element => {
           <div
             style={{
               width: "100%",
-              minWidth: "max-content",
+              minWidth: "min-content",
             }}
           >
-            <p>{c.content}</p>
+            <p
+              style={{
+                fontSize: "small",
+                wordWrap: "normal",
+                maxWidth: "100%",
+              }}
+            >
+              {c.content}
+            </p>
           </div>
         );
         const ItemsElement = (
           <div
             style={{
               width: "100%",
-              minWidth: "max-content",
+              minWidth: "min-content",
               height: "calc(100% - 1rem)",
               display: "flex",
               flexDirection: "column",
-              flexWrap: "wrap",
+              overflowY: "scroll",
+              overflowWrap: "normal",
             }}
           >
             {c.items?.map((i, index2) => {
               const key2 = "AdminPanelCardItem" + index2;
               return (
-                <p key={key2} style={{ padding: "0.2rem" }}>
+                <p
+                  key={key2}
+                  style={{
+                    padding: "0.2rem",
+                    fontSize: "small",
+                    wordWrap: "normal",
+                  }}
+                >
                   {i}
                 </p>
               );
@@ -122,36 +138,31 @@ function AdminPanel(): JSX.Element | null {
       <Cards
         info={[
           {
-            title: "-------- ------: 0",
+            title: "Usuários : 39/50",
+            content:
+              "Parece que sua licença de usuários está chegando ao limite, caso deseje atualizar seu plano acesse: http://www.example.com.br",
+          },
+          {
+            title: "Módulos ativos: 7/7",
             items: [
-              "Financeiro",
-              "Contas a pagar",
-              "Contas a receber",
-              "Administrativo",
-              "Fiscal",
+              "Clientes",
+              "Fornecedores",
               "Logística",
+              "Dashboards",
+              "Vendas",
+              "Estoque",
+              "Agenda",
             ],
           },
           {
-            title: "-------- ------: 0",
+            title: "Rastreamento de acessos: 27",
             items: [
-              "Financeiro",
-              "Contas a pagar",
-              "Contas a receber",
-              "Administrativo",
-              "Fiscal",
-              "Logística",
-            ],
-          },
-          {
-            title: "-------- ------: 0",
-            items: [
-              "Financeiro",
-              "Contas a pagar",
-              "Contas a receber",
-              "Administrativo",
-              "Fiscal",
-              "Logística",
+              "[13/05/2023 16:00]: Tarefa concluída, 'juliana.moura' criou o cliente 'Stefanini'",
+              "[13/05/2023 15:40]: Permissão negada, 'juliana.moura' não possui acesso ao módulo 'Estoque'",
+              "[13/05/2023 15:40]: , 'juliana.moura' não possui acesso ao módulo 'Estoque'",
+              "[13/05/2023 15:40]: Permissão negada, 'juliana.moura' não possui acesso ao módulo 'Estoque'",
+              "[13/05/2023 15:40]: Permissão negada, 'juliana.moura' não possui acesso ao módulo 'Estoque'",
+              "[13/05/2023 15:40]: Permissão negada, 'juliana.moura' não possui acesso ao módulo 'Estoque'",
             ],
           },
           {

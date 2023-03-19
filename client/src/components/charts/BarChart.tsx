@@ -21,10 +21,10 @@ const Style = styled.div`
   box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
 `;
 
-function PieChart() {
+function BarChart() {
   const ref = useRef();
 
-  const data: ChartData<"pie", number[], string> = {
+  const data: ChartData<"bar", number[], string> = {
     labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
     datasets: [
       {
@@ -34,10 +34,9 @@ function PieChart() {
     ],
   };
 
-  const options: ChartOptions<"pie"> = {
+  const options: ChartOptions<"bar"> = {
     aspectRatio: 1,
     responsive: true,
-    radius: "100%",
     normalized: true,
     maintainAspectRatio: false,
     plugins: {
@@ -66,9 +65,9 @@ function PieChart() {
 
   return (
     <Style>
-      <Chart type="pie" data={data} ref={ref} options={options} />
+      <Chart type="bar" data={data} ref={ref} options={options} />
     </Style>
   );
 }
 
-export default memo(PieChart);
+export default memo(BarChart);

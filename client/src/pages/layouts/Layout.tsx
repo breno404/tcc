@@ -15,8 +15,6 @@ function Layout(): JSX.Element {
   const [refreshToken, setRefreshToken] = useState(cookies.refreshToken);
 
   useMemo(() => {
-    console.log(cookies);
-
     return () => {
       if (!cookies) {
         setUser(undefined);
@@ -36,7 +34,7 @@ function Layout(): JSX.Element {
           flexWrap: "wrap",
         }}
       >
-        <Header title="Home" />
+        <Header title="Smart $ales" />
         <section style={{ display: "flex", width: "100%" }}>
           <SideBar />
           <Main>

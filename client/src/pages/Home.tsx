@@ -1,43 +1,60 @@
 import React from "react";
 import AdminPanel from "@/components/AdminPanel";
 import Breadcrumb from "@/components/Breadcrumb";
-import PieChart from "@/components/charts/PieChart";
 import DoughnutChart from "@/components/charts/DoughnutChart";
 import AreaChart from "@/components/charts/RadarChart";
-import GoogleMap from "@/components/map/GoogleMap";
+import BarChart from "@/components/charts/BarChart";
+import Table from "@/components/Table";
+import styled from "styled-components";
+
+const Style = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  padding: 2rem;
+  justify-content: center;
+  border-radius: 1.2rem;
+
+  & > div {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    padding-bottom: 2rem;
+    padding-right: 2rem;
+    flex-shrink: 1;
+  }
+`;
 
 function Home() {
   return (
     <>
       <Breadcrumb />
-      <AdminPanel />
-      <div
-        style={{
-          display: "flex",
-          flexWrap: "wrap",
-          padding: "2rem",
-          justifyContent: "center",
-          border: "2px solid black",
-          borderRadius: "1.2rem",
-        }}
-      >
-        <div
-          style={{
-            width: "100%",
-            display: "flex",
-            flexWrap: "wrap",
-            justifyContent: "center",
-            alignItems: "center",
-            paddingBottom: "2rem",
-            paddingRight: "2rem",
-            flexShrink: 1,
-          }}
-        >
-          <PieChart />
+      {/* <AdminPanel /> */}
+      <Style>
+        <div>
+          <BarChart />
           <DoughnutChart />
           <AreaChart />
+
+          <Table
+            datasets={[
+              {
+                label: "Data de venda",
+                data: ["20/03/2023", "25/05/2023", "04/08/2023"],
+              },
+              {
+                label: "Valor da venda",
+                data: ["25.000,00", "48.876,00", "10.000,00"],
+              },
+              {
+                label: "Vendedor",
+                data: ["Juliana Moura", "Luiz Ribeiro", "Arnaldo Coelho"],
+              },
+            ]}
+          />
         </div>
-      </div>
+      </Style>
     </>
   );
 }

@@ -1,5 +1,5 @@
-import { useRef } from "react";
-import {  Chart } from "react-chartjs-2";
+import { memo, useRef } from "react";
+import { Chart } from "react-chartjs-2";
 import "chart.js/auto";
 import styled from "styled-components";
 import { ChartData, ChartOptions } from "chart.js/auto";
@@ -87,4 +87,4 @@ function DoughnutChart() {
   );
 }
 
-export default DoughnutChart;
+export default memo(DoughnutChart);

@@ -1,12 +1,14 @@
 import Details from "@/pages/Details";
 import NotFound from "@/pages/NotFound";
 import Login from "@/pages/Login";
-import Layout from "@/pages/Layout";
+import Layout from "@/pages/layouts/Layout";
 import Home from "@/pages/Home";
 import { createBrowserRouter, RouteObject } from "react-router-dom";
 import Admin from "@/pages/admin/Admin";
 import Tracking from "@/pages/logistics/Tracking";
 import Logistics from "@/pages/logistics/Logistics";
+import LayoutLogistics from "./pages/layouts/LayoutLogistics";
+import Signup from "./pages/Signup";
 
 const home: RouteObject = {
   index: true,
@@ -47,6 +49,7 @@ const admin: RouteObject = {
     };
   },
 };
+
 const tracking: RouteObject = {
   path: "tracking",
   element: <Tracking />,
@@ -63,7 +66,7 @@ const tracking: RouteObject = {
   },
 };
 const logistics: RouteObject = {
-  path: "logistics",
+  index: true,
   element: <Logistics />,
   loader: async ({ request, params }) => {
     return {
@@ -75,18 +78,24 @@ const logistics: RouteObject = {
       },
     };
   },
-  children: [tracking],
+};
+const layoutLogistics: RouteObject = {
+  path: "logistics",
+  element: <LayoutLogistics />,
+  children: [logistics, tracking],
 };
 const login: RouteObject = { path: "login", element: <Login /> };
+const signup: RouteObject = { path: "signup", element: <Signup /> };
 const notFound: RouteObject = { path: "*", element: <NotFound /> };
 //--------------------------------------------------------------------------
 const router = createBrowserRouter([
   {
     path: "/",
     element: <Layout />,
-    children: [home, details, admin, logistics],
+    children: [home, details, admin, layoutLogistics],
   },
   login,
+  signup,
   notFound,
 ]);
 

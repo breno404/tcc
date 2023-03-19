@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { memo, useRef } from "react";
 import { Chart } from "react-chartjs-2";
 import "chart.js/auto";
 import styled from "styled-components";
@@ -79,4 +79,4 @@ function RadarChart() {
   );
 }
 
-export default RadarChart;
+export default memo(RadarChart);
