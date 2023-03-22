@@ -6,6 +6,7 @@ import AreaChart from "@/components/charts/RadarChart";
 import BarChart from "@/components/charts/BarChart";
 import Table from "@/components/Table";
 import styled from "styled-components";
+import Search from "@/components/Search";
 
 const Style = styled.div`
   display: flex;
@@ -30,26 +31,30 @@ function Home() {
   return (
     <>
       <Breadcrumb />
-      {/* <AdminPanel /> */}
+      <AdminPanel />
       <Style>
         <div>
           <BarChart />
           <DoughnutChart />
           <AreaChart />
-
           <Table
             datasets={[
               {
                 label: "Data de venda",
-                data: ["20/03/2023", "25/05/2023", "04/08/2023"],
+                data: ["20/03/2023", "25/05/2023", "04/08/2023", "01/04/2023"],
               },
               {
                 label: "Valor da venda",
-                data: ["25.000,00", "48.876,00", "10.000,00"],
+                data: ["25.000,00", "48.876,00", "10.000,00", "5,00"],
               },
               {
                 label: "Vendedor",
-                data: ["Juliana Moura", "Luiz Ribeiro", "Arnaldo Coelho"],
+                data: [
+                  "Juliana Moura",
+                  "Luiz Ribeiro",
+                  "Arnaldo Coelho",
+                  "Julio Cocielo",
+                ],
               },
             ]}
           />

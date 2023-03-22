@@ -1,6 +1,7 @@
-import { memo, useEffect, useMemo } from "react";
+import { memo, useCallback, useEffect, useMemo, useState } from "react";
 import SortIcon from "@/assets/SortIcon.svg";
 import styled from "styled-components";
+import Search from "./Search";
 
 const Style = styled.div`
   width: 100%;
@@ -23,6 +24,18 @@ const Style = styled.div`
     width: 100%;
     border-collapse: collapse;
     background-color: #fff;
+  }
+
+  & > .not-found-data {
+    padding: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    background-color: #fff;
+    font-size: 1.4rem;
+    border: 1px solid #dee2e6;
+    border-top: none;
   }
 
   & > table th {
@@ -69,9 +82,11 @@ type TableProps = {
 };
 
 function Table({ headers, datasets }: TableProps) {
+  const [filter, setFilter] = useState(datasets);
+
   useMemo(() => {
     if (headers && headers.length > 0) {
-      if (headers.length !== datasets.length) {
+      if (headers.length !== filter.length) {
         throw new Error(
           "Caso os Headers sejam fornecidos os mesmos devem possuir tamanho igual ao dataset da tabela"
         );
@@ -80,9 +95,9 @@ function Table({ headers, datasets }: TableProps) {
   }, [headers, datasets]);
 
   const RenderHeaders = () => {
-    let HeadersElements = [];
+    let HeaderElements = [];
     if (headers && headers.length > 0) {
-      HeadersElements = headers.map((text, index) => {
+      HeaderElements = headers.map((text, index) => {
         const key = "TableHeader-" + text;
         return (
           <th key={key}>
@@ -94,7 +109,7 @@ function Table({ headers, datasets }: TableProps) {
         );
       });
     } else {
-      HeadersElements = datasets.map((ds, index) => {
+      HeaderElements = filter.map((ds, index) => {
         const key = "TableHeader-" + ds.label;
         return (
           <th key={key}>
@@ -107,35 +122,55 @@ function Table({ headers, datasets }: TableProps) {
       });
     }
 
-    return <tr>{HeadersElements}</tr>;
+    return <tr>{HeaderElements}</tr>;
   };
+
+  const RenderRows = useCallback(() => {
+    const BodyElements: any[] = [];
+    const datasetsLength = filter.length;
+    const rowsLength = filter[0].data.length;
+
+    for (let j = 0; j < rowsLength; j++) {
+      const row: any[] = [];
+      for (let i = 0; i < datasetsLength; i++) {
+        const key2 = "tableData-".concat(
+          String(i),
+          String(j),
+          "-",
+          filter[i].data[j]
+        );
+
+        row.push(<td key={key2}>{filter[i].data[j]}</td>);
+      }
+      const key = "tableRow-" + j;
+      BodyElements.push(<tr key={key}>{row}</tr>);
+    }
+
+    return <>{BodyElements}</>;
+  }, [filter]);
+
+  const handleSetFilter = useCallback(
+    (value: any[]) => {
+      setFilter([...value]);
+    },
+    [filter]
+  );
 
   return (
     <Style>
+      <Search datasets={datasets} setFilter={handleSetFilter} />
+      <br />
       <table>
         <thead>
           <RenderHeaders />
         </thead>
         <tbody>
-          <tr>
-            <td>1</td>
-            <td>2</td>
-            <td>3</td>
-          </tr>
-          <tr>
-            <td>4</td>
-            <td>5</td>
-            <td>6</td>
-          </tr>
+          {filter && filter[0].data.length > 0 ? <RenderRows /> : null}
         </tbody>
-        <tfoot>
-          <tr>
-            <td>e</td>
-            <td>f</td>
-            <td>g</td>
-          </tr>
-        </tfoot>
       </table>
+      {!filter || filter[0].data.length <= 0 ? (
+        <div className="not-found-data">Nenhum dado encontrado.</div>
+      ) : null}
     </Style>
   );
 }
