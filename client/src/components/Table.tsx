@@ -5,7 +5,7 @@ import Search from "./Search";
 
 const Style = styled.div`
   width: 100%;
-  height: 500px;
+  min-height: 500px;
   color: #000;
   margin: 2rem 0 0 2rem;
   padding: 2rem;
@@ -83,6 +83,8 @@ type TableProps = {
 
 function Table({ headers, datasets }: TableProps) {
   const [filter, setFilter] = useState(datasets);
+  const [limit, setLimit] = useState(25);
+  const [offSet, setOffSet] = useState(0);
 
   useMemo(() => {
     if (headers && headers.length > 0) {
@@ -127,8 +129,13 @@ function Table({ headers, datasets }: TableProps) {
 
   const RenderRows = useCallback(() => {
     const BodyElements: any[] = [];
-    const datasetsLength = filter.length;
-    const rowsLength = filter[0].data.length;
+    const filterLimited = filter.map((ob) => {
+      const lim =
+        ob.data.length < offSet * limit ? ob.data.length : offSet * limit;
+      return { ...ob, data: ob.data.slice(offSet * limit), lim };
+    });
+    const datasetsLength = filterLimited.length;
+    const rowsLength = filterLimited[0].data.length;
 
     for (let j = 0; j < rowsLength; j++) {
       const row: any[] = [];
@@ -137,10 +144,10 @@ function Table({ headers, datasets }: TableProps) {
           String(i),
           String(j),
           "-",
-          filter[i].data[j]
+          filterLimited[i].data[j]
         );
 
-        row.push(<td key={key2}>{filter[i].data[j]}</td>);
+        row.push(<td key={key2}>{filterLimited[i].data[j]}</td>);
       }
       const key = "tableRow-" + j;
       BodyElements.push(<tr key={key}>{row}</tr>);
@@ -148,6 +155,98 @@ function Table({ headers, datasets }: TableProps) {
 
     return <>{BodyElements}</>;
   }, [filter]);
+
+  const RenderFooter = useCallback(() => {
+    const filterLimited = filter.map((ob) => {
+      const lim =
+        ob.data.length < offSet * limit ? ob.data.length : offSet * limit;
+      return { ...ob, data: ob.data.slice(offSet * limit), lim };
+    });
+    const filterLength = filter[0].data.length;
+    const length = Math.ceil(filterLength / limit);
+    const range = [...Array(length).keys()];
+    const buttons = [];
+
+    for (let n of range) {
+      const key = "offsetButton-" + n;
+      buttons.push(
+        <button
+          key={key}
+          onClick={() => setOffSet(n)}
+          style={{ padding: "10px", fontWeight: "bolder" }}
+        >
+          {n + 1}
+        </button>
+      );
+    }
+
+    const LimitElement = () => (
+      <select
+        name="limit"
+        id="limit"
+        defaultValue={limit}
+        style={{ border: "1px solid #dee2e6" }}
+        onChange={(event) => {
+          const val = parseInt(event.currentTarget.value);
+          setLimit(val);
+        }}
+      >
+        <option value="25">25</option>
+        <option value="50">50</option>
+        <option value="75">75</option>
+        <option value="100">100</option>
+      </select>
+    );
+
+    return (
+      <div
+        style={{
+          display: "flex",
+          flexWrap: "wrap",
+          width: "100%",
+          marginTop: "1rem",
+          fontSize: "1.2rem",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            flex: 1,
+            justifyContent: "start",
+            alignItems: "center",
+          }}
+        >
+          Mostrar por página: <LimitElement />
+        </div>
+        <div
+          style={{
+            display: "flex",
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          {buttons}
+        </div>
+        <div
+          style={{
+            display: "flex",
+            flex: 1,
+            justifyContent: "end",
+            alignItems: "center",
+          }}
+        >
+          {offSet * limit + 1} -{" "}
+          {(offSet + 1) * limit > filterLength
+            ? filterLength
+            : (offSet + 1) * limit}{" "}
+          de {filterLength}
+        </div>
+      </div>
+    );
+  }, [limit, offSet, filter]);
 
   const handleSetFilter = useCallback(
     (value: any[]) => {
@@ -171,6 +270,7 @@ function Table({ headers, datasets }: TableProps) {
       {!filter || filter[0].data.length <= 0 ? (
         <div className="not-found-data">Nenhum dado encontrado.</div>
       ) : null}
+      {filter && filter[0].data.length > 0 ? <RenderFooter /> : null}
     </Style>
   );
 }

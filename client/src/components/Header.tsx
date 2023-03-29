@@ -28,13 +28,14 @@ const Logo = styled.p`
   }
 `;
 
-type headerProps = { title: string };
+type headerProps = { title: string; onClick: Function };
 
 const HamburguerButton = ({ onClick }: { onClick: Function }) => {
   return (
     <button
       style={{
         display: "flex",
+        cursor: "pointer",
         alignItems: "center",
         flexDirection: "column",
         justifyContent: "center",
@@ -80,12 +81,12 @@ const HamburguerButton = ({ onClick }: { onClick: Function }) => {
   );
 };
 
-function Header({ title }: headerProps): React.ReactElement {
+function Header({ title, onClick }: headerProps): React.ReactElement {
   const theme = useTheme();
   return (
     <Style theme={theme} mode="main">
       <div style={{ flex: 1 }}>
-        <HamburguerButton onClick={() => {}} />
+        <HamburguerButton onClick={onClick} />
       </div>
       <div style={{ flex: 1, display: "flex", justifyContent: "center" }}>
         <Logo />

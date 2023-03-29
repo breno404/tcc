@@ -9,6 +9,10 @@ import Tracking from "@/pages/logistics/Tracking";
 import Logistics from "@/pages/logistics/Logistics";
 import LayoutLogistics from "./pages/layouts/LayoutLogistics";
 import Signup from "./pages/Signup";
+import LayoutUsers from "./pages/layouts/LayoutUsers";
+import NewUser from "./pages/users/NewUser";
+import UpdateUser from "./pages/users/UpdateUser";
+import Users from "./pages/users/Users";
 
 const home: RouteObject = {
   index: true,
@@ -84,6 +88,56 @@ const layoutLogistics: RouteObject = {
   element: <LayoutLogistics />,
   children: [logistics, tracking],
 };
+const newUser: RouteObject = {
+  path: "new",
+  element: <NewUser />,
+  loader: async ({ request, params }) => {
+    return {
+      breadcrumb: {
+        routes: [
+          { name: "Home", href: "/" },
+          { name: "Usuários", href: "/users" },
+          { name: "Novo", href: "/users/new" },
+        ],
+      },
+    };
+  },
+};
+const updateUser: RouteObject = {
+  path: "update/:id",
+  element: <UpdateUser />,
+  loader: async ({ request, params }) => {
+    return {
+      breadcrumb: {
+        routes: [
+          { name: "Home", href: "/" },
+          { name: "Usuários", href: "/users" },
+          { name: "Atualizar", href: "/users/update" },
+        ],
+      },
+    };
+  },
+};
+const users: RouteObject = {
+  index: true,
+  element: <Users />,
+  loader: async ({ request, params }) => {
+    return {
+      breadcrumb: {
+        routes: [
+          { name: "Home", href: "/" },
+          { name: "Usuários", href: "/users" },
+        ],
+      },
+    };
+  },
+};
+const layoutUsers: RouteObject = {
+  path: "users",
+  element: <LayoutUsers />,
+  children: [users, newUser, updateUser],
+};
+
 const login: RouteObject = { path: "login", element: <Login /> };
 const signup: RouteObject = { path: "signup", element: <Signup /> };
 const notFound: RouteObject = { path: "*", element: <NotFound /> };
@@ -92,7 +146,7 @@ const router = createBrowserRouter([
   {
     path: "/",
     element: <Layout />,
-    children: [home, details, admin, layoutLogistics],
+    children: [home, details, admin, layoutLogistics, layoutUsers],
   },
   login,
   signup,

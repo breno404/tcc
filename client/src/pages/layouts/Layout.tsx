@@ -14,6 +14,8 @@ function Layout(): JSX.Element {
   const [accessToken, setAccessToken] = useState(cookies.accessToken);
   const [refreshToken, setRefreshToken] = useState(cookies.refreshToken);
 
+  const [sideBarOpen, setSideBarOpen] = useState(true);
+
   useMemo(() => {
     return () => {
       if (!cookies) {
@@ -34,9 +36,12 @@ function Layout(): JSX.Element {
           flexWrap: "wrap",
         }}
       >
-        <Header title="Smart $ales" />
+        <Header
+          title="Smart $ales"
+          onClick={() => setSideBarOpen(!sideBarOpen)}
+        />
         <section style={{ display: "flex", width: "100%" }}>
-          <SideBar />
+          <SideBar open={sideBarOpen} />
           <Main>
             <article style={{ width: "100%", padding: "1rem" }}>
               <Outlet />

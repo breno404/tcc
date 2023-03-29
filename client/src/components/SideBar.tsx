@@ -3,13 +3,23 @@ import styled, { useTheme } from "styled-components";
 import useAccount from "@/hooks/useAccount";
 import { Link } from "react-router-dom";
 const Style = styled.aside<{ mode: "main" | "light" | "dark" }>`
-  width: 23rem;
   flex-shrink: 0;
   height: 100%;
   min-height: calc(100vh - 5rem);
   background-color: ${({ theme, mode }: any) =>
     theme[mode].secondary.backgroundColor};
   color: ${({ theme, mode }: any) => theme[mode].secondary.textColor};
+
+  &.open {
+    width: 23rem;
+  }
+  &.close {
+    width: 6rem;
+  }
+
+  &.close ul {
+    visibility: hidden;
+  }
 
   & .menu {
     width: 100%;
@@ -76,15 +86,15 @@ const Menu = memo((props: MenuProps) => {
   );
 });
 
-type SideBarProps = { menu: MenuProps };
+type SideBarProps = { open: boolean };
 
-function SideBar(): React.ReactElement {
+function SideBar({ open }: SideBarProps): React.ReactElement {
   const theme = useTheme();
   //const { user } = useAccount();
 
   const user = { name: "Breno Macedo Ernani de Sá" };
   return (
-    <Style theme={theme} mode="main">
+    <Style theme={theme} mode="main" className={open ? "open" : "close"}>
       <ul>
         <Menu abas={[{ name: "Clientes", href: "customers" }]} />
         <li>{user?.name}</li>
