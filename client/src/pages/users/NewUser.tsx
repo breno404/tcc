@@ -33,6 +33,7 @@ const Style = styled.div`
     display: flex;
     justify-content: center;
     align-items: center;
+    flex-wrap: wrap;
   }
 `;
 
@@ -40,20 +41,25 @@ const StyledInput = styled.fieldset`
   flex: 1;
   margin: 1rem 0 0 1rem;
   padding: 0 1rem 1rem 0;
+  font-size: 1.4rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 
-  & input[type="text"] {
+  & input {
     height: 3rem;
     border: 1px solid #dedede;
     outline: none;
     padding: 0 5px;
   }
 
-  & input[type="text"]:focus {
+  & input:focus {
     border: 1px solid #4da6ff;
   }
 `;
 
 const StyledProfile = styled.fieldset`
+  margin-bottom: 2rem;
   & input[type="file"] {
     display: none;
   }
@@ -77,9 +83,10 @@ type InputProps = {
   id: string;
   value: string | number;
   label: string;
+  type: string;
 };
 
-const Input = ({ htmlFor, onChange, id, name, value, label }: any) => {
+const Input = ({ htmlFor, onChange, id, name, value, label, type }: any) => {
   return (
     <StyledInput>
       <label htmlFor={htmlFor}>
@@ -87,7 +94,7 @@ const Input = ({ htmlFor, onChange, id, name, value, label }: any) => {
         <input
           id={id}
           name={name}
-          type="text"
+          type={type || "text"}
           value={value}
           onChange={onChange}
         />
@@ -111,6 +118,12 @@ const Profile = ({ htmlFor, onChange, id, name, value, src }: any) => {
 
 function NewUser(): JSX.Element {
   const [profileImage, setpProfileImage] = useState(profileImgDefault);
+  const [userName, setUserName] = useState("");
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
   const handleChangeProfilePhoto = useCallback(
     (event: any) => {
@@ -122,6 +135,31 @@ function NewUser(): JSX.Element {
     },
     [profileImage]
   );
+
+  const handleChangeUserName = (event: any) => {
+    const val = event.currentTarget.value;
+    setUserName(val);
+  };
+  const handleChangeName = (event: any) => {
+    const val = event.currentTarget.value;
+    setName(val);
+  };
+  const handleChangeEmail = (event: any) => {
+    const val = event.currentTarget.value;
+    setEmail(val);
+  };
+  const handleChangePhone = (event: any) => {
+    const val = event.currentTarget.value;
+    setPhone(val);
+  };
+  const handleChangePassword = (event: any) => {
+    const val = event.currentTarget.value;
+    setPassword(val);
+  };
+  const handleChangeConfirmPassword = (event: any) => {
+    const val = event.currentTarget.value;
+    setConfirmPassword(val);
+  };
 
   return (
     <>
@@ -145,14 +183,16 @@ function NewUser(): JSX.Element {
                 name="user"
                 htmlFor="user"
                 label="Usuário"
-                value={""}
+                value={userName}
+                onChange={handleChangeUserName}
               />
               <Input
                 id="name"
                 name="name"
                 htmlFor="name"
                 label="Nome"
-                value={""}
+                value={name}
+                onChange={handleChangeName}
               />
             </section>
             <section>
@@ -161,14 +201,16 @@ function NewUser(): JSX.Element {
                 name="email"
                 htmlFor="email"
                 label="E-mail"
-                value={""}
+                value={email}
+                onChange={handleChangeEmail}
               />
               <Input
                 id="phone"
                 name="phone"
                 htmlFor="phone"
                 label="Telefone"
-                value={""}
+                value={phone}
+                onChange={handleChangePhone}
               />
             </section>
             <section>
@@ -177,14 +219,18 @@ function NewUser(): JSX.Element {
                 name="password"
                 htmlFor="password"
                 label="Senha"
-                value={""}
+                type="password"
+                value={password}
+                onChange={handleChangePassword}
               />
               <Input
                 id="confirmPassword"
                 name="confirmPassword"
                 htmlFor="confirmPassword"
                 label="Confirmar senha"
-                value={""}
+                type="password"
+                value={confirmPassword}
+                onChange={handleChangeConfirmPassword}
               />
             </section>
           </form>
