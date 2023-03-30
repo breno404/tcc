@@ -49,7 +49,8 @@ type MenuProps = {
       | "Vendas"
       | "Estoque"
       | "Dashboards"
-      | "Agenda";
+      | "Agenda"
+      | "Usuários";
     href:
       | "customers"
       | "manufactures"
@@ -57,7 +58,8 @@ type MenuProps = {
       | "sales"
       | "inventory"
       | "dashboards"
-      | "calendar";
+      | "calendar"
+      | "users";
   }[];
 };
 
@@ -96,7 +98,12 @@ function SideBar({ open }: SideBarProps): React.ReactElement {
   return (
     <Style theme={theme} mode="main" className={open ? "open" : "close"}>
       <ul>
-        <Menu abas={[{ name: "Clientes", href: "customers" }]} />
+        <Menu
+          abas={[
+            { name: "Clientes", href: "customers" },
+            { name: "Usuários", href: "users" },
+          ]}
+        />
         <li>{user?.name}</li>
       </ul>
     </Style>
