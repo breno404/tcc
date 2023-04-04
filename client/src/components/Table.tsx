@@ -45,6 +45,10 @@ const Style = styled.div`
     background-color: #fff;
   }
 
+  & > table th:first-child {
+    display: none;
+  }
+
   & > table th > p {
     display: flex;
     align-items: center;
@@ -62,6 +66,7 @@ const Style = styled.div`
     vertical-align: middle;
     font-size: 1.2rem;
     padding: 10px;
+    cursor: pointer;
   }
 
   & > table > tbody > tr {
@@ -71,17 +76,23 @@ const Style = styled.div`
   & > table > tbody > tr:nth-child(2n) {
     background-color: #eeeeee;
   }
+
+  & > table > tbody > tr > td:first-child {
+    display: none;
+  }
 `;
 
 type TableProps = {
+  onClickCallBack: (value: any) => void;
   headers?: string[];
   datasets: {
     label: string;
+    hidden?: boolean;
     data: any[];
   }[];
 };
 
-function Table({ headers, datasets }: TableProps) {
+function Table({ headers, datasets, onClickCallBack }: TableProps) {
   const [filter, setFilter] = useState(datasets);
   const [limit, setLimit] = useState(25);
   const [offSet, setOffSet] = useState(0);
@@ -101,26 +112,46 @@ function Table({ headers, datasets }: TableProps) {
     if (headers && headers.length > 0) {
       HeaderElements = headers.map((text, index) => {
         const key = "TableHeader-" + text;
-        return (
-          <th key={key}>
-            <p>
-              <span>{text}</span>
-              <img src={SortIcon} onClick={() => {}} />
-            </p>
-          </th>
-        );
+        if (text.toLowerCase() !== "id") {
+          return (
+            <th key={key}>
+              <p>
+                <span>{text}</span>
+                <img src={SortIcon} onClick={() => {}} />
+              </p>
+            </th>
+          );
+        } else {
+          return (
+            <th key={key}>
+              <p>
+                <span>{""}</span>
+              </p>
+            </th>
+          );
+        }
       });
     } else {
       HeaderElements = filter.map((ds, index) => {
         const key = "TableHeader-" + ds.label;
-        return (
-          <th key={key}>
-            <p>
-              <span>{ds.label}</span>
-              <img src={SortIcon} onClick={() => {}} />
-            </p>
-          </th>
-        );
+        if (ds.label.toLowerCase() !== "id") {
+          return (
+            <th key={key}>
+              <p>
+                <span>{ds.label}</span>
+                <img src={SortIcon} onClick={() => {}} />
+              </p>
+            </th>
+          );
+        } else {
+          return (
+            <th key={key}>
+              <p>
+                <span>{""}</span>
+              </p>
+            </th>
+          );
+        }
       });
     }
 
@@ -147,7 +178,25 @@ function Table({ headers, datasets }: TableProps) {
           filterLimited[i].data[j]
         );
 
-        row.push(<td key={key2}>{filterLimited[i].data[j]}</td>);
+        if (filterLimited[i].hidden) {
+          row.push(
+            <td
+              key={key2}
+              onClick={() => onClickCallBack(filterLimited[0].data[j])}
+            >
+              {""}
+            </td>
+          );
+        } else {
+          row.push(
+            <td
+              key={key2}
+              onClick={() => onClickCallBack(filterLimited[0].data[j])}
+            >
+              {filterLimited[i].data[j]}
+            </td>
+          );
+        }
       }
       const key = "tableRow-" + j;
       BodyElements.push(<tr key={key}>{row}</tr>);

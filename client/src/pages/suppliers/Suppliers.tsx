@@ -1,6 +1,5 @@
 import React from "react";
 import Breadcrumb from "@/components/Breadcrumb";
-import { useNavigate } from "react-router-dom";
 import Table from "@/components/Table";
 import styled from "styled-components";
 import Search from "@/components/Search";
@@ -25,20 +24,13 @@ const Style = styled.div`
 `;
 
 function Users() {
-  const navigate = useNavigate();
-  const usersTableClickCallBack = (value: string) => {
-    navigate("/users/update/" + value);
-  };
-
   return (
     <>
       <Breadcrumb />
       <Style>
         <div>
           <Table
-            onClickCallBack={usersTableClickCallBack}
             datasets={[
-              { label: "id", hidden: true, data: [1, 2, 3, 4] },
               {
                 label: "Usuário",
                 data: ["bmacedo", "dmolina", "fdomingues", "psilva"],

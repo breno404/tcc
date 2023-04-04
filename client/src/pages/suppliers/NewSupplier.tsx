@@ -1,19 +1,8 @@
 import Breadcrumb from "@/components/Breadcrumb";
 import styled from "styled-components";
 import profileImgDefault from "@/assets/profile.webp";
-import {
-  ChangeEvent,
-  ChangeEventHandler,
-  MouseEventHandler,
-  useCallback,
-  useEffect,
-  useState,
-} from "react";
+import { MouseEventHandler, useCallback, useState } from "react";
 import axios, { AxiosHeaders, AxiosRequestConfig } from "axios";
-import PhoneInput from "@/components/inputs/PhoneInput";
-import PasswordInput from "@/components/inputs/PasswordInput";
-import TextInput from "@/components/inputs/TextInput";
-import validate from "@/helpers/validate";
 
 const Style = styled.div`
   display: flex;
@@ -92,71 +81,98 @@ const Button = ({ backgroundColor, label, onClick }: ButtonProps) => {
   );
 };
 
-const StyledProfile = styled.fieldset<{ src: string; srcDefault: string }>`
+const StyledInput = styled.fieldset`
+  flex: 1;
+  margin: 1rem 0 0 1rem;
+  padding: 0 1rem 1rem 0;
+  font-size: 1.4rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  & input {
+    height: 3rem;
+    border: 1px solid #dedede;
+    outline: none;
+    padding: 0 5px;
+    border-radius: 5px;
+  }
+
+  & input:focus {
+    border: 1px solid #4da6ff;
+  }
+`;
+
+const StyledProfile = styled.fieldset`
   margin-bottom: 2rem;
   & input[type="file"] {
     display: none;
   }
 
   & .profile {
-    width: 150px;
-    height: 150px;
+    max-width: 150px;
+    max-height: 150px;
     border-radius: 50%;
     overflow: hidden;
     border: 1px solid #dee2e6;
     cursor: pointer;
-    background-image: ${({ src, srcDefault }) => {
-      return src && src != "" ? `url(${src});` : `url(${srcDefault});`;
-    }};
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: cover;
-    background-color: #dedede;
+  }
+
+  & .profile img {
+    max-width: 100%;
   }
 `;
 
-type ProfileProps = {
+type InputProps = {
   htmlFor: string;
-  onChangeCallBack: (value: File | null) => void;
+  onChange: (event: any) => void;
   id: string;
   name: string;
-  src: string;
-  srcDefault: string;
+  value: string | number;
+  label: string;
+  type?: string;
 };
 
-const Profile = (props: ProfileProps) => {
-  const [file, setFile] = useState<File | null>(null);
-  const accept = ["image/png", "image/jpeg", "image/webp"].join(", ");
-
-  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files) {
-      const [photo] = event.target.files;
-      setFile(photo);
-    }
-  };
-
-  useEffect(() => {
-    props.onChangeCallBack(file);
-  }, [file]);
-
+const Input = ({
+  htmlFor,
+  onChange,
+  id,
+  name,
+  value,
+  label,
+  type,
+}: InputProps) => {
   return (
-    <StyledProfile src={props.src} srcDefault={props.srcDefault}>
-      <label htmlFor={props.htmlFor}>
-        <div className="profile"></div>
+    <StyledInput>
+      <label htmlFor={htmlFor}>
+        <p>{label}</p>
         <input
-          id={props.id}
-          name={props.name}
-          type="file"
-          onChange={handleChange}
-          accept={accept}
+          id={id}
+          name={name}
+          type={type || "text"}
+          value={value}
+          onChange={onChange}
         />
+      </label>
+    </StyledInput>
+  );
+};
+
+const Profile = ({ htmlFor, onChange, id, name, value, src }: any) => {
+  return (
+    <StyledProfile>
+      <label htmlFor={htmlFor}>
+        <div className="profile">
+          <img src={src} alt={name} />
+        </div>
+        <input id={id} name={name} type="file" onChange={onChange} />
       </label>
     </StyledProfile>
   );
 };
 
-function NewUser(): JSX.Element {
-  const [profileImage, setpProfileImage] = useState("");
+function NewSupplier(): JSX.Element {
+  const [profileImage, setpProfileImage] = useState(profileImgDefault);
   const [userName, setUserName] = useState("");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -164,41 +180,47 @@ function NewUser(): JSX.Element {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
-  const handleChangeProfileCallBack = useCallback(
-    (photo: File | null) => {
-      if (photo) {
+  const handleChangeProfilePhoto = useCallback(
+    (event: any) => {
+      if (event.target.files) {
+        const [photo] = event.target.files;
+
         setpProfileImage(URL.createObjectURL(photo));
-      } else {
-        setpProfileImage("");
       }
     },
     [profileImage]
   );
 
-  const handleChangeUserNameCallBack = (value: string) => {
-    setUserName(value);
+  const handleChangeUserName = (event: any) => {
+    const val = event.currentTarget.value;
+    setUserName(val);
   };
-  const handleChangeNameCallBack = (value: string) => {
-    setName(value);
+  const handleChangeName = (event: any) => {
+    const val = event.currentTarget.value;
+    setName(val);
   };
-  const handleChangeEmailCallBack = (value: string) => {
-    setEmail(value);
+  const handleChangeEmail = (event: any) => {
+    const val = event.currentTarget.value;
+    setEmail(val);
   };
-  const handleChangePhoneCallBack = (value: string) => {
-    setPhone(value);
+  const handleChangePhone = (event: any) => {
+    const val = event.currentTarget.value;
+    setPhone(val);
   };
-  const handleChangePasswordCallBack = (value: string) => {
-    setPassword(value);
+  const handleChangePassword = (event: any) => {
+    const val = event.currentTarget.value;
+    setPassword(val);
   };
-  const handleChangeConfirmPasswordCallBack = (value: string) => {
-    setConfirmPassword(value);
+  const handleChangeConfirmPassword = (event: any) => {
+    const val = event.currentTarget.value;
+    setConfirmPassword(val);
   };
 
   const handleClearForm = (
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
     event.preventDefault();
-    setpProfileImage("");
+    setpProfileImage(profileImgDefault);
     setUserName("");
     setName("");
     setEmail("");
@@ -210,81 +232,49 @@ function NewUser(): JSX.Element {
   const handleSubmitData = useCallback(
     (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
       event.preventDefault();
-      let valid = true;
 
-      let validEmail =
-        validate.exists(email) &&
-        validate.has(email, { specialChar: true }).length == 0;
+      (async () => {
+        const url = "";
+        const data = { userName, name, email, phone, password };
+        const config: AxiosRequestConfig = {
+          baseURL: "baseUrl",
+          responseType: "json",
+          headers: {
+            Accept: "application/json",
+            "Content-Type":
+              "application/json;application/x-www-form-urlencoded",
+            "User-Agent": window.navigator.userAgent,
+            Authorization: "Bearer token",
+          },
+        };
 
-      let validUserName = validate.exists(userName);
-      let validName = validate.exists(name);
-      let validPhone = validate.exists(phone);
-      let validPassword =
-        validate.exists(password) &&
-        validate.has(password, {
-          minLenght: 8,
-          specialChar: true,
-          digits: true,
-        }).length == 0;
+        try {
+          const response = await axios.post(url, data, config);
+          const url2 = "";
+          const formData = new FormData();
 
-      if (!validPassword) {
-        valid = false;
-      }
+          const image = await fetch(profileImage).then((r) => r.blob());
 
-      if (password !== confirmPassword) {
-        valid = false;
-      }
+          formData.append("profile", image);
 
-      if (!validName || !validEmail || !validUserName || !validPhone) {
-        valid = false;
-      }
-
-      if (valid) {
-        (async () => {
-          const url = "";
-          const data = { userName, name, email, phone, password };
-          const config: AxiosRequestConfig = {
+          const config2: AxiosRequestConfig = {
             baseURL: "baseUrl",
             responseType: "json",
             headers: {
               Accept: "application/json",
-              "Content-Type":
-                "application/json;application/x-www-form-urlencoded",
+              "Content-Type": "multipart/form-data",
               "User-Agent": window.navigator.userAgent,
               Authorization: "Bearer token",
             },
           };
 
-          try {
-            const response = await axios.post(url, data, config);
-            const url2 = "";
-            const formData = new FormData();
-
-            const image = await fetch(profileImage).then((r) => r.blob());
-
-            formData.append("profile", image);
-
-            const config2: AxiosRequestConfig = {
-              baseURL: "baseUrl",
-              responseType: "json",
-              headers: {
-                Accept: "application/json",
-                "Content-Type": "multipart/form-data",
-                "User-Agent": window.navigator.userAgent,
-                Authorization: "Bearer token",
-              },
-            };
-
-            if (response.status == 200) {
-              const response2 = await axios.post(url2, data, config2);
-            }
-          } catch (err) {
-            console.log(err);
+          if (response.status == 200) {
+            const response2 = await axios.post(url2, data, config2);
           }
-        })();
-      } else {
-        console.log("Corrija alguns campos antes de enviar a requisição.");
-      }
+        } catch (err) {
+          console.log(err);
+        }
+      })();
     },
     [profileImage, userName, name, email, phone, password]
   );
@@ -301,65 +291,64 @@ function NewUser(): JSX.Element {
                 name="profile"
                 htmlFor="profile"
                 src={profileImage}
-                srcDefault={profileImgDefault}
-                onChangeCallBack={handleChangeProfileCallBack}
+                value={""}
+                onChange={handleChangeProfilePhoto}
               />
             </section>
             <section>
-              <TextInput
+              <Input
                 id="user"
                 name="user"
                 htmlFor="user"
                 label="Usuário"
                 value={userName}
-                onChangeCallBack={handleChangeUserNameCallBack}
+                onChange={handleChangeUserName}
               />
-              <TextInput
+              <Input
                 id="name"
                 name="name"
                 htmlFor="name"
                 label="Nome"
                 value={name}
-                onChangeCallBack={handleChangeNameCallBack}
+                onChange={handleChangeName}
               />
             </section>
             <section>
-              <TextInput
+              <Input
                 id="email"
                 name="email"
                 htmlFor="email"
-                type="email"
                 label="E-mail"
                 value={email}
-                onChangeCallBack={handleChangeEmailCallBack}
+                onChange={handleChangeEmail}
               />
-              <PhoneInput
+              <Input
                 id="phone"
                 name="phone"
                 htmlFor="phone"
                 label="Telefone"
                 value={phone}
-                type="tel"
-                onChangeCallBack={handleChangePhoneCallBack}
+                onChange={handleChangePhone}
               />
             </section>
             <section>
-              <PasswordInput
+              <Input
                 id="password"
                 name="password"
                 htmlFor="password"
                 label="Senha"
+                type="password"
                 value={password}
-                onChangeCallBack={handleChangePasswordCallBack}
+                onChange={handleChangePassword}
               />
-              <TextInput
+              <Input
                 id="confirmPassword"
                 name="confirmPassword"
                 htmlFor="confirmPassword"
                 label="Confirmar senha"
-                type="text"
+                type="password"
                 value={confirmPassword}
-                onChangeCallBack={handleChangeConfirmPasswordCallBack}
+                onChange={handleChangeConfirmPassword}
               />
             </section>
             <section>
@@ -389,4 +378,4 @@ function NewUser(): JSX.Element {
   );
 }
 
-export default NewUser;
+export default NewSupplier;

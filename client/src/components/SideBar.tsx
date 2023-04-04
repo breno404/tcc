@@ -53,7 +53,7 @@ type MenuProps = {
       | "Usuários";
     href:
       | "customers"
-      | "manufactures"
+      | "suppliers"
       | "logistics"
       | "sales"
       | "inventory"
@@ -101,6 +101,7 @@ function SideBar({ open }: SideBarProps): React.ReactElement {
         <Menu
           abas={[
             { name: "Clientes", href: "customers" },
+            { name: "Fornecedores", href: "suppliers" },
             { name: "Usuários", href: "users" },
           ]}
         />
