@@ -1,22 +1,14 @@
 import "reflect-metadata";
 import { ApolloServer } from "apollo-server";
-
-import { UsersResolver } from "./resolvers/users-resolvers";
 import { buildSchema } from "type-graphql";
-import path from "node:path";
+import { UserResolver } from "./user.resolver";
 
-async function init() {
+export default async function init() {
   const schema = await buildSchema({
-    resolvers: [UsersResolver],
-    emitSchemaFile: path.resolve(__dirname, "schema.gql"),
-    validate: { forbidUnknownValues: false },
+    resolvers: [UserResolver],
   });
 
   const server = new ApolloServer({ schema });
-
-  const { url } = await server.listen();
-
-  console.log(`HTTP server running on ${url}`);
+  await server.listen(4000);
+  console.log("Server has started!");
 }
-
-init();
