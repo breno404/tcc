@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "noEmit": true,
     "target": "ESNext",
     "lib": ["ES2018", "ESNext.AsyncIterable"],
     "module": "CommonJS",
@@ -7,19 +8,20 @@
     "moduleResolution": "node16",
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "baseUrl": "src",
-    "paths": {
-      "@/storage/*": ["../storage/*"],
-      "@/models/*": ["models/*"],
-      "@/repositories/*": ["repositories/*"],
-      "@/resolvers/*": ["resolvers/*"],
-      "@/database/*": ["database/*"],
-      "@/types/*": ["types/*"],
-      "@/config/*": ["config/*"],
-      //"@/environment/*": ["environments/*"],
-      "@/helpers/*": ["helpers/*"],
-      "@/tests/*": ["tests/*"]
-    },
+    //"baseUrl": ".",
+    // "paths": {
+    //   "@/*": ["src/*"],
+    //   "@/storage/*": ["storage/*"],
+    //   "@/models/*": ["src/models/*"],
+    //   "@/repositories/*": ["src/repositories/*"],
+    //   "@/resolvers/*": ["src/resolvers/*"],
+    //   "@/database/*": ["src/database/*"],
+    //   "@/types/*": ["src/types/*"],
+    //   "@/config/*": ["src/config/*"],
+    //   //"@/environment/*": ["src/environments/*"],
+    //   "@/helpers/*": ["src/helpers/*"],
+    //   "@/tests/*": ["src/tests/*"]
+    // },
     "typeRoots": [],
     "types": [],
     "resolvePackageJsonExports": true,
@@ -30,7 +32,6 @@
     "declaration": true,
     "outDir": "./dist",
     "removeComments": true,
-    "noEmit": true,
     "preserveConstEnums": true,
     "isolatedModules": true,
     "allowSyntheticDefaultImports": true,

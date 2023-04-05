@@ -1,10 +1,13 @@
 import "reflect-metadata";
 import { ApolloServer } from "apollo-server";
 import { buildSchema } from "type-graphql";
-import { UserResolver } from "@/resolvers/user.resolver";
-import config from "@/config/config";
+import { UserResolver } from "./resolvers/user.resolver";
+import dataBase from "./database/init";
+//import config from "@/config/config";
 
 export default async function init() {
+  dataBase.init();
+
   const schema = await buildSchema({
     resolvers: [UserResolver],
   });

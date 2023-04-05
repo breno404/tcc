@@ -9,6 +9,9 @@ class User {
   name!: String;
 
   @Field()
+  userName!: String;
+
+  @Field()
   email!: String;
 }
 

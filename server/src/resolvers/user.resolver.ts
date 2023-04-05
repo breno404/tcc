@@ -9,8 +9,13 @@ class UserResolver {
   private readonly userRepository = new UserRepository();
 
   @Query(() => UserType, { nullable: true })
-  async user(@Arg("id") id: string): Promise<User | null> {
+  async userById(@Arg("id") id: string): Promise<User | null> {
     return this.userRepository.findById(id);
+  }
+
+  @Query(() => UserType, { nullable: true })
+  async userByEmail(@Arg("email") email: string): Promise<User | null> {
+    return this.userRepository.findByEmail(email);
   }
 
   @Query(() => [UserType])
@@ -18,6 +23,7 @@ class UserResolver {
     return this.userRepository.findAll();
   }
 
+  //---------------------------------------------------------------------------
   @Mutation(() => UserType)
   async createUser(@Arg("data") data: UserInput): Promise<User> {
     return this.userRepository.create(data);

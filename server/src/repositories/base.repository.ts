@@ -8,7 +8,7 @@ abstract class BaseRepository<T extends Model> implements IRepository<T> {
   ) {}
 
   async create(entity: any): Promise<T> {
-    return this.model.create(entity);
+    return this.model.create({id:"9772b16c-4624-410c-a320-09599ff81503",...entity});
   }
 
   async findById(id: string): Promise<T | null> {

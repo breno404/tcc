@@ -10,15 +10,35 @@ interface UserAttributes {
 }
 
 class User extends Model<UserAttributes> implements UserAttributes {
-  public id!: string;
-  public name!: string;
-  public userName!: string;
-  public email!: string;
-  public password!: string;
+  private _id!: string;
+  private _name!: string;
+  private _userName!: string;
+  private _email!: string;
+  private _password!: string;
 
-  public static associate(models: any): void {
-    // Associações aqui
+  get id() {
+    return this._id;
   }
+
+  get name() {
+    return this._name;
+  }
+
+  get userName() {
+    return this._userName;
+  }
+
+  get email() {
+    return this._email;
+  }
+
+  get password() {
+    return this._password;
+  }
+
+  // public static associate(models: any): void {
+  //   // Associações aqui
+  // }
 }
 
 User.init(
