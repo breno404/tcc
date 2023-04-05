@@ -13,6 +13,9 @@ class User {
 
   @Field()
   email!: String;
+
+  @Field()
+  password!: String;
 }
 
 export { User };

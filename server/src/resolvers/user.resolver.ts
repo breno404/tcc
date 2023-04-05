@@ -3,6 +3,7 @@ import User from "../models/user.model";
 import { UserRepository } from "../repositories/user.repository";
 import { UserInput } from "../types/input/user.input";
 import { User as UserType } from "../types/object/user.type";
+import { v4 as uuidv4 } from "uuid";
 
 @Resolver(UserType)
 class UserResolver {
@@ -26,6 +27,10 @@ class UserResolver {
   //---------------------------------------------------------------------------
   @Mutation(() => UserType)
   async createUser(@Arg("data") data: UserInput): Promise<User> {
+    const UserAttributes: UserType = {
+      id: uuidv4(),
+      ...data,
+    };
     return this.userRepository.create(data);
   }
 

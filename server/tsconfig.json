@@ -23,7 +23,7 @@
     //   "@/tests/*": ["src/tests/*"]
     // },
     "typeRoots": [],
-    "types": [],
+    "types": ["sequelize"],
     "resolvePackageJsonExports": true,
     "resolvePackageJsonImports": true,
     "resolveJsonModule": true,
