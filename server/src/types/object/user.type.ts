@@ -3,7 +3,7 @@ import { ObjectType, Field, ID } from "type-graphql";
 @ObjectType()
 class User {
   @Field(() => ID)
-  id!: BigInt;
+  id!: String;
 
   @Field()
   name!: String;

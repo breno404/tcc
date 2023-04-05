@@ -1,7 +1,8 @@
 import "reflect-metadata";
 import { ApolloServer } from "apollo-server";
 import { buildSchema } from "type-graphql";
-import { UserResolver } from "./user.resolver";
+import { UserResolver } from "@/resolvers/user.resolver";
+import config from "@/config/config";
 
 export default async function init() {
   const schema = await buildSchema({
@@ -9,6 +10,7 @@ export default async function init() {
   });
 
   const server = new ApolloServer({ schema });
-  await server.listen(4000);
+
+  await server.listen(3000);
   console.log("Server has started!");
 }

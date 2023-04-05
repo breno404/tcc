@@ -3,8 +3,7 @@ import { BaseRepository } from "./base.repository";
 
 class UserRepository extends BaseRepository<User> {
   constructor() {
-    console.log(typeof User)
-    super((User);
+    super(User);
   }
 
   async findByEmail(email: string): Promise<User | null> {

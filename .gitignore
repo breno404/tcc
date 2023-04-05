@@ -24,3 +24,5 @@ client/*.sw?
 
 server/node_modules
 server/dist
+
+node_modules
