@@ -1,4 +1,3 @@
-import React from "react";
 import AdminPanel from "@/components/AdminPanel";
 import Breadcrumb from "@/components/Breadcrumb";
 import DoughnutChart from "@/components/charts/DoughnutChart";
@@ -6,7 +5,6 @@ import AreaChart from "@/components/charts/RadarChart";
 import BarChart from "@/components/charts/BarChart";
 import Table from "@/components/Table";
 import styled from "styled-components";
-import Search from "@/components/Search";
 
 const Style = styled.div`
   display: flex;
@@ -57,6 +55,9 @@ function Home() {
                 ],
               },
             ]}
+            onClickCallBack={function (value: any): void {
+              throw new Error("Function not implemented.");
+            }}
           />
         </div>
       </Style>

@@ -1,95 +1,46 @@
 import axios from "axios";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 interface Options {
-  params?: { [key: string]: string | number };
-  data?: { [key: string]: string | number | FormData };
-  headers: { Authorization?: string };
+  query: string;
+  headers: { Authorization?: string; "Content-Type": "application/json" };
   baseUrl: string;
-  url: string;
+  url?: string;
 }
 
 function useGraphQL<T>(options: Options) {
-  const [data, setData] = useState<Partial<T> | null>(null);
+  const [data, setData] = useState<T | null>(null);
   const [error, setError] = useState<any | null>(null);
   const [statusCode, setStatusCode] = useState<any | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const get = useMemo(() => {
+  const doRequest = useCallback(() => {
     setIsLoading(true);
     axios
-      .get(options.url, {
-        baseURL: options.baseUrl,
-        headers: options.headers,
-        data: options.data,
-        params: options.params,
-      })
+      .post(
+        options?.url || "/",
+        { query: options.query },
+        {
+          baseURL: options.baseUrl,
+          headers: options.headers,
+        }
+      )
       .then((response) => {
+        const { data: graphQlData } = response.data;
         setStatusCode(response.status);
-        setData(response.data || null);
-      })
-      .catch((err) => setError(err))
-      .finally(() => setIsLoading(false));
-  }, [options]);
-
-  const post = useMemo(() => {
-    const dataRequest = { ...options.data };
-    setIsLoading(true);
-    axios
-      .post(options.url, dataRequest, {
-        baseURL: options.baseUrl,
-        headers: options.headers,
-        params: options.params,
-      })
-      .then((response) => {
-        setStatusCode(response.status);
-        setData(response.data || null);
-      })
-      .catch((err) => setError(err))
-      .finally(() => setIsLoading(false));
-  }, [options]);
-
-  const put = useMemo(() => {
-    const dataRequest = { ...options.data };
-    setIsLoading(true);
-    axios
-      .put(options.url, dataRequest, {
-        baseURL: options.baseUrl,
-        headers: options.headers,
-        params: options.params,
-      })
-      .then((response) => {
-        setStatusCode(response.status);
-        setData(response.data || null);
-      })
-      .catch((err) => setError(err))
-      .finally(() => setIsLoading(false));
-  }, [options]);
-
-  const del = useMemo(() => {
-    setIsLoading(true);
-    axios
-      .delete(options.url, {
-        baseURL: options.baseUrl,
-        headers: options.headers,
-        params: options.params,
-      })
-      .then((response) => {
-        setStatusCode(response.status);
-        setData(response.data || null);
+        setData(graphQlData);
       })
       .catch((err) => setError(err))
       .finally(() => setIsLoading(false));
   }, [options]);
 
   return {
-    get,
-    post,
-    put,
-    del,
+    doRequest,
     isLoading,
     statusCode,
     data,
     error,
   };
 }
+
+export default useGraphQL;

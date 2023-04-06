@@ -1,30 +1,27 @@
 import { Resolver, Query, Arg, Mutation } from "type-graphql";
-import { UserRepository } from "../repositories/user.repository";
 import { UserInput } from "../types/input/user.input";
 import { User as UserType } from "../types/object/user.type";
+import UserService from "../services/user.service";
+import LoggerService from "../services/logger.service";
 
 @Resolver(UserType)
 class UserResolver {
-  private readonly userRepository = new UserRepository();
-
   @Query(() => UserType, { nullable: true })
   async userById(@Arg("id") id: string): Promise<UserType | null> {
-    let user = await this.userRepository.findById(id);
-    if (!user) return null;
-    return user.toJSON();
+    const service = new UserService();
+    return service.findUserById(id);
   }
 
   @Query(() => UserType, { nullable: true })
   async userByEmail(@Arg("email") email: string): Promise<UserType | null> {
-    const user = await this.userRepository.findByEmail(email);
-    if (!user) return null;
-    return user.toJSON();
+    const service = new UserService();
+    return service.findUserByEmail(email);
   }
 
   @Query(() => [UserType], { nullable: true })
   async users(): Promise<UserType[]> {
-    const users = (await this.userRepository.findAll()).map((u) => u.toJSON());
-    return users;
+    const service = new UserService();
+    return service.findAllUsers();
   }
 
   //---------------------------------------------------------------------------
@@ -32,10 +29,9 @@ class UserResolver {
   async createUser(
     @Arg("data", { validate: { forbidUnknownValues: false } })
     data: UserInput
-  ): Promise<UserType> {
-    const user = await this.userRepository.create(data);
-    if (!user) throw Error(`There was a failure creating the user`);
-    return user;
+  ): Promise<UserType | null> {
+    const service = new UserService();
+    return service.createUser(data);
   }
 
   @Mutation(() => UserType)
@@ -43,18 +39,14 @@ class UserResolver {
     @Arg("id") id: string,
     @Arg("data", { validate: { forbidUnknownValues: false } }) data: UserInput
   ): Promise<UserType | null> {
-    await this.userRepository.update(id, data);
-
-    const user = await this.userRepository.findById(id);
-
-    if (!user) return null;
-    return user.toJSON();
+    const service = new UserService();
+    return service.updateUser(id, data);
   }
 
   @Mutation(() => Boolean)
   async deleteUser(@Arg("id") id: string): Promise<boolean> {
-    const deletedRows = await this.userRepository.delete(id);
-    return Boolean(deletedRows);
+    const service = new UserService();
+    return service.deleteUser(id);
   }
 }
 

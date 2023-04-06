@@ -3,17 +3,19 @@ import styled from "styled-components";
 import profileImgDefault from "@/assets/profile.webp";
 import {
   ChangeEvent,
-  ChangeEventHandler,
   MouseEventHandler,
   useCallback,
   useEffect,
+  useMemo,
   useState,
 } from "react";
-import axios, { AxiosHeaders, AxiosRequestConfig } from "axios";
 import PhoneInput from "@/components/inputs/PhoneInput";
 import PasswordInput from "@/components/inputs/PasswordInput";
 import TextInput from "@/components/inputs/TextInput";
 import validate from "@/helpers/validate";
+import useGraphQL from "@/hooks/useGraphQL";
+import { userById as userQuery } from "@/graphQL/index";
+import { useParams } from "react-router-dom";
 
 const Style = styled.div`
   display: flex;
@@ -155,7 +157,41 @@ const Profile = (props: ProfileProps) => {
   );
 };
 
+type UserQueryResponse = {
+  user: {
+    id?: string;
+    name?: string;
+    userName?: string;
+    email?: string;
+    phone?: string;
+  };
+};
+
 function UpdateUser(): JSX.Element {
+  const { id } = useParams();
+  const {
+    data: userResponse,
+    error,
+    doRequest: doUserRequest,
+  } = useGraphQL<UserQueryResponse>({
+    query: userQuery(["id", "userName", "name", "email", "phone"], {
+      id: id || "",
+    }),
+    baseUrl: "http://127.0.0.1:3000/",
+    headers: { "Content-Type": "application/json" },
+  });
+  console.log(
+    userQuery(["id", "userName", "name", "email", "phone"], {
+      id: id || "",
+    })
+  );
+  useMemo(() => {
+    if (id) doUserRequest();
+  }, [id]);
+
+  console.log(error);
+
+  //------------------------------------------------------------
   const [profileImage, setpProfileImage] = useState("");
   const [userName, setUserName] = useState("");
   const [name, setName] = useState("");
@@ -163,6 +199,18 @@ function UpdateUser(): JSX.Element {
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+
+  useMemo(() => {
+    console.log(userResponse);
+    const user = userResponse?.user;
+
+    if (user) {
+      setUserName(user.userName || "");
+      setName(user.name || "");
+      setEmail(user.email || "");
+      setPhone(user.phone || "");
+    }
+  }, [userResponse]);
 
   const handleChangeProfileCallBack = useCallback(
     (photo: File | null) => {
@@ -174,39 +222,6 @@ function UpdateUser(): JSX.Element {
     },
     [profileImage]
   );
-
-  const handleLoadData = async () => {
-    const url = "";
-    const config: AxiosRequestConfig = {
-      baseURL: "baseUrl",
-      responseType: "json",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json;application/x-www-form-urlencoded",
-        "User-Agent": window.navigator.userAgent,
-        Authorization: "Bearer token",
-      },
-    };
-
-    try {
-      const response = await axios.get(url, config);
-
-      if (response.data) {
-        const { data } = response;
-        setpProfileImage(data.profileImage);
-        setUserName(data.userName);
-        setName(data.name);
-        setEmail(data.email);
-        setPhone(data.phone);
-      }
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
-  useEffect(() => {
-    handleLoadData();
-  }, []);
 
   const handleChangeUserNameCallBack = (value: string) => {
     setUserName(value);

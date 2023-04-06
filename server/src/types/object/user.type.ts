@@ -3,22 +3,22 @@ import { ObjectType, Field, ID } from "type-graphql";
 @ObjectType()
 class User {
   @Field(() => ID)
-  id: String;
+  id: string;
 
   @Field()
-  name: String;
+  name: string;
 
   @Field()
-  phone: String;
+  phone: string;
 
   @Field()
-  userName: String;
+  userName: string;
 
   @Field()
-  email: String;
+  email: string;
 
   @Field()
-  password: String;
+  password: string;
 }
 
 export { User };
