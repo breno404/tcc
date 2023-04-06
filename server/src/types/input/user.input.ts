@@ -4,12 +4,15 @@ import { InputType, Field } from "type-graphql";
 class UserInput {
   @Field()
   name!: string;
-  
+
   @Field()
   userName!: string;
 
   @Field()
   email!: string;
+
+  @Field()
+  phone!: string;
 
   @Field()
   password!: string;

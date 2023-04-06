@@ -1,46 +1,54 @@
 import { Resolver, Query, Arg, Mutation } from "type-graphql";
-import User from "../models/user.model";
 import { UserRepository } from "../repositories/user.repository";
 import { UserInput } from "../types/input/user.input";
 import { User as UserType } from "../types/object/user.type";
-import { v4 as uuidv4 } from "uuid";
 
 @Resolver(UserType)
 class UserResolver {
   private readonly userRepository = new UserRepository();
 
   @Query(() => UserType, { nullable: true })
-  async userById(@Arg("id") id: string): Promise<User | null> {
-    return this.userRepository.findById(id);
+  async userById(@Arg("id") id: string): Promise<UserType | null> {
+    let user = await this.userRepository.findById(id);
+    if (!user) return null;
+    return user.toJSON();
   }
 
   @Query(() => UserType, { nullable: true })
-  async userByEmail(@Arg("email") email: string): Promise<User | null> {
-    return this.userRepository.findByEmail(email);
+  async userByEmail(@Arg("email") email: string): Promise<UserType | null> {
+    const user = await this.userRepository.findByEmail(email);
+    if (!user) return null;
+    return user.toJSON();
   }
 
-  @Query(() => [UserType])
-  async users(): Promise<User[]> {
-    return this.userRepository.findAll();
+  @Query(() => [UserType], { nullable: true })
+  async users(): Promise<UserType[]> {
+    const users = (await this.userRepository.findAll()).map((u) => u.toJSON());
+    return users;
   }
 
   //---------------------------------------------------------------------------
   @Mutation(() => UserType)
-  async createUser(@Arg("data") data: UserInput): Promise<User> {
-    const UserAttributes: UserType = {
-      id: uuidv4(),
-      ...data,
-    };
-    return this.userRepository.create(data);
+  async createUser(
+    @Arg("data", { validate: { forbidUnknownValues: false } })
+    data: UserInput
+  ): Promise<UserType> {
+    const user = await this.userRepository.create(data);
+    if (!user) throw Error(`There was a failure creating the user`);
+    return user;
   }
 
   @Mutation(() => UserType)
   async updateUser(
     @Arg("id") id: string,
-    @Arg("data") data: UserInput
-  ): Promise<User | null> {
+    @Arg("data", { validate: { forbidUnknownValues: false } }) data: UserInput
+  ): Promise<UserType | null> {
     await this.userRepository.update(id, data);
-    return this.userRepository.findById(id);
+
+    const user = await this.userRepository.findById(id);
+
+    if (!user) return null;
+    return user.toJSON();
   }
 
   @Mutation(() => Boolean)

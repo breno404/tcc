@@ -1,19 +1,18 @@
 import { NonAbstract } from "sequelize-typescript/dist/shared/types";
 import { IRepository } from "../types";
 import { Model } from "sequelize";
-import { MakeNullishOptional } from "sequelize/types/utils";
 
 abstract class BaseRepository<T extends Model> implements IRepository<T> {
   constructor(
     protected readonly model: (new () => T) & NonAbstract<typeof Model>
   ) {}
 
-  async create(entity: any): Promise<T> {
+  async create(entity): Promise<T> {
     return this.model.create(entity);
   }
 
   async findById(id: string): Promise<T | null> {
-    return this.model.findByPk(id as unknown as string);
+    return this.model.findByPk(id);
   }
 
   async findAll(): Promise<T[]> {
@@ -21,7 +20,6 @@ abstract class BaseRepository<T extends Model> implements IRepository<T> {
   }
 
   async update(id: string, entity: Partial<T>): Promise<[number, T[]]> {
-    console.log(entity);
     return this.model.update(entity, {
       where: { attribute: { ["id"]: id } },
       returning: true,

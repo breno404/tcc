@@ -1,75 +1,55 @@
-import { Model, DataTypes } from "sequelize";
+import { Model, ModelAttributes, Optional, DataTypes } from "sequelize";
+import { v4 as uuidv4 } from "uuid";
 import { sequelize } from "../database/config";
 
 interface UserAttributes {
   id: string;
   name: string;
+  phone: string;
   userName: string;
   email: string;
   password: string;
 }
 
+//<UserAttributes> implements UserAttributes
+
 class User extends Model<UserAttributes> implements UserAttributes {
-  private _id!: string;
-  private _name!: string;
-  private _userName!: string;
-  private _email!: string;
-  private _password!: string;
-
-  get id() {
-    return this._id;
-  }
-
-  get name() {
-    return this._name;
-  }
-
-  get userName() {
-    return this._userName;
-  }
-
-  get email() {
-    return this._email;
-  }
-
-  get password() {
-    return this._password;
-  }
-
-  // public static associate(models: any): void {
-  //   // Associações aqui
-  // }
+  id: string;
+  name: string;
+  phone: string;
+  userName: string;
+  email: string;
+  password: string;
 }
 
-User.init(
-  {
-    id: {
-      type: DataTypes.UUIDV4,
-      autoIncrement: true,
-      primaryKey: true,
-    },
-    userName: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    name: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    email: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      unique: true,
-    },
-    password: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
+const modelAttributes: ModelAttributes<
+  User,
+  Optional<UserAttributes, never>
+> = {
+  id: {
+    type: DataTypes.UUIDV4,
+    primaryKey: true,
+    defaultValue: uuidv4(),
+    allowNull: false,
+    comment: "The value must be an UUIDV4",
   },
-  {
-    sequelize,
-    tableName: "users",
-  }
-);
+  name: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  phone: { type: DataTypes.STRING, allowNull: true, unique: true },
+  userName: { type: DataTypes.STRING, allowNull: false, unique: true },
+  email: { type: DataTypes.STRING, allowNull: false, unique: true },
+  password: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    comment: "The value must be a HASH",
+  },
+};
+
+User.init(modelAttributes, {
+  sequelize,
+  tableName: "users",
+});
 
 export default User;
