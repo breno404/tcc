@@ -156,7 +156,7 @@ const Profile = (props: ProfileProps) => {
 };
 
 function NewUser(): JSX.Element {
-  const [profileImage, setpProfileImage] = useState("");
+  const [profileImage, setProfileImage] = useState("");
   const [userName, setUserName] = useState("");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -167,9 +167,9 @@ function NewUser(): JSX.Element {
   const handleChangeProfileCallBack = useCallback(
     (photo: File | null) => {
       if (photo) {
-        setpProfileImage(URL.createObjectURL(photo));
+        setProfileImage(URL.createObjectURL(photo));
       } else {
-        setpProfileImage("");
+        setProfileImage("");
       }
     },
     [profileImage]
@@ -198,7 +198,7 @@ function NewUser(): JSX.Element {
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
     event.preventDefault();
-    setpProfileImage("");
+    setProfileImage("");
     setUserName("");
     setName("");
     setEmail("");

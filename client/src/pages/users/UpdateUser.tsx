@@ -14,8 +14,12 @@ import PasswordInput from "@/components/inputs/PasswordInput";
 import TextInput from "@/components/inputs/TextInput";
 import validate from "@/helpers/validate";
 import useGraphQL from "@/hooks/useGraphQL";
-import { userById as userQuery } from "@/graphQL/index";
+import {
+  userById as userQuery,
+  updateUser as updateUserMutation,
+} from "@/graphQL/index";
 import { useParams } from "react-router-dom";
+import axios, { AxiosRequestConfig } from "axios";
 
 const Style = styled.div`
   display: flex;
@@ -192,7 +196,7 @@ function UpdateUser(): JSX.Element {
   console.log(error);
 
   //------------------------------------------------------------
-  const [profileImage, setpProfileImage] = useState("");
+  const [profileImage, setProfileImage] = useState("");
   const [userName, setUserName] = useState("");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -201,7 +205,6 @@ function UpdateUser(): JSX.Element {
   const [confirmPassword, setConfirmPassword] = useState("");
 
   useMemo(() => {
-    console.log(userResponse);
     const user = userResponse?.user;
 
     if (user) {
@@ -215,9 +218,9 @@ function UpdateUser(): JSX.Element {
   const handleChangeProfileCallBack = useCallback(
     (photo: File | null) => {
       if (photo) {
-        setpProfileImage(URL.createObjectURL(photo));
+        setProfileImage(URL.createObjectURL(photo));
       } else {
-        setpProfileImage("");
+        setProfileImage("");
       }
     },
     [profileImage]
@@ -246,7 +249,7 @@ function UpdateUser(): JSX.Element {
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
     event.preventDefault();
-    setpProfileImage("");
+    setProfileImage("");
     setUserName("");
     setName("");
     setEmail("");
@@ -258,80 +261,86 @@ function UpdateUser(): JSX.Element {
   const handleSubmitData = useCallback(
     (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
       event.preventDefault();
-      let valid = true;
+      // let valid = true;
 
-      let validEmail =
-        validate.exists(email) &&
-        validate.has(email, { specialChar: true }).length == 0;
+      // let validEmail =
+      //   validate.exists(email) &&
+      //   validate.has(email, { specialChar: true }).length == 0;
 
-      let validUserName = validate.exists(userName);
-      let validName = validate.exists(name);
-      let validPhone = validate.exists(phone);
-      let validPassword =
-        validate.exists(password) &&
-        validate.has(password, {
-          minLenght: 8,
-          specialChar: true,
-          digits: true,
-        }).length == 0;
+      // let validUserName = validate.exists(userName);
+      // let validName = validate.exists(name);
+      // let validPhone = validate.exists(phone);
+      // let validPassword =
+      //   validate.exists(password) &&
+      //   validate.has(password, {
+      //     minLenght: 8,
+      //     specialChar: true,
+      //     digits: true,
+      //   }).length == 0;
 
-      if (!validPassword) {
-        valid = false;
-      }
+      // if (!validPassword) {
+      //   valid = false;
+      // }
 
-      if (password !== confirmPassword) {
-        valid = false;
-      }
+      // if (password === confirmPassword || (!password && !confirmPassword)) {
+      //   valid = true;
+      // }
 
-      if (!password && !confirmPassword) {
-        valid = true;
-      }
+      // if (!validName || !validEmail || !validUserName || !validPhone) {
+      //   valid = false;
+      // }
 
-      if (!validName || !validEmail || !validUserName || !validPhone) {
-        valid = false;
-      }
-
+      const valid = true;
       if (valid) {
         (async () => {
-          const url = "";
-          let data;
-          if (password) data = { userName, name, email, phone, password };
-          else data = { userName, name, email, phone };
-          const config: AxiosRequestConfig = {
-            baseURL: "baseUrl",
+          let url = "/graphql";
+          // const mutation = updateUserMutation(
+          //   ["id", "userName", "name", "email", "phone"],
+          //   {
+          //     userName,
+          //     name,
+          //     email,
+          //     phone,
+          //   }
+          // );
+          // let data = { query: mutation };
+          let config: AxiosRequestConfig = {
+            baseURL: "http://localhost:3000",
             responseType: "json",
             headers: {
               Accept: "application/json",
               "Content-Type":
                 "application/json;application/x-www-form-urlencoded",
-              "User-Agent": window.navigator.userAgent,
               Authorization: "Bearer token",
             },
           };
 
           try {
-            const response = await axios.post(url, data, config);
-            const url2 = "";
+            // const response = await axios.post(url, data, config);
+
+            // if (response.status == 200) {
             const formData = new FormData();
+            const blob = await (await fetch(profileImage)).blob();
+            const filename = `profile-${id}.${blob.type.split("/")[1]}`;
+            const image = new File([blob], filename, {
+              lastModified: new Date().getTime(),
+              type: blob.type,
+            });
 
-            const image = await fetch(profileImage).then((r) => r.blob());
-
+            url = "/upload/profile";
+            formData.append("userId", String(id));
             formData.append("profile", image);
-
-            const config2: AxiosRequestConfig = {
-              baseURL: "baseUrl",
-              responseType: "json",
+            config = {
+              baseURL: "http://localhost:3000",
               headers: {
                 Accept: "application/json",
                 "Content-Type": "multipart/form-data",
-                "User-Agent": window.navigator.userAgent,
                 Authorization: "Bearer token",
               },
             };
 
-            if (response.status == 200) {
-              const response2 = await axios.post(url2, data, config2);
-            }
+            const responseUpload = await axios.post(url, formData, config);
+            // }
           } catch (err) {
             console.log(err);
           }

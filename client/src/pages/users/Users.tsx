@@ -5,6 +5,7 @@ import styled from "styled-components";
 import useGraphQL from "@/hooks/useGraphQL";
 import { users as usersQuery } from "@/graphQL/index";
 import { useCallback, useEffect, useMemo } from "react";
+import AddUserIcon from "@/assets/AddUserIcon.svg";
 
 type UsersQueryResponse = {
   users: [
@@ -33,6 +34,33 @@ const Style = styled.div`
     padding-bottom: 2rem;
     padding-right: 2rem;
     flex-shrink: 1;
+  }
+`;
+
+const StyleButton = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  color: #000;
+  width: 100%;
+  margin: 2rem 0 0 2rem;
+  padding: 2rem 2rem 0 2rem;
+
+  & button {
+    width: 35px;
+    height: 35px;
+    border: 1px solid #fff;
+    background-color: #ffffff;
+    border-color: #dedede;
+    box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+
+  & button > img {
+    max-height: 100%;
+    max-width: 100%;
+    padding: 5px;
   }
 `;
 
@@ -90,6 +118,11 @@ function Users() {
       <Breadcrumb />
       <Style>
         <div>
+          <StyleButton>
+            <button onClick={() => navigate("/users/new")}>
+              <img src={AddUserIcon} alt="addUserIcon" />
+            </button>
+          </StyleButton>
           <Table
             onClickCallBack={usersTableClickCallBack}
             datasets={datasets()}

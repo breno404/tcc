@@ -5,7 +5,7 @@ class LoggerService implements IObserver {
   private static instance: LoggerService;
   private dir: string;
   private filename: string;
-  public observerType: string;
+  public observerType: string = "LoggerService";
 
   private constructor(dir?: string, filename?: string) {
     this.dir = dir
@@ -15,8 +15,6 @@ class LoggerService implements IObserver {
     this.filename = filename
       ? filename
       : `error-${new Date().toJSON().slice(0, 10)}.log`;
-
-    this.observerType = "LoggerService";
   }
 
   static init(): LoggerService {

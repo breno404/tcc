@@ -18,7 +18,7 @@ function useGraphQL<T>(options: Options) {
     setIsLoading(true);
     axios
       .post(
-        options?.url || "/",
+        options?.url || "/graphql",
         { query: options.query },
         {
           baseURL: options.baseUrl,
