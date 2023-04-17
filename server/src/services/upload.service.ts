@@ -47,8 +47,14 @@ class UploadService implements IObserver {
 
     srcFile.pipe(dstWriteStream, { end: true });
 
-    srcFile.close();
-    dstWriteStream.close();
+    srcFile.close((err) => {
+      throw err;
+    });
+    dstWriteStream.close((err) => {
+      throw err;
+    });
+
+    return dstPath;
   }
 }
 export default UploadService;

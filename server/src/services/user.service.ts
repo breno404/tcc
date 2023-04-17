@@ -69,6 +69,13 @@ class UserService implements ISubject {
     const deletedRows = await this.userRepository.delete(id);
     return Boolean(deletedRows);
   }
+
+  syncProfileImageById(userId: any, destPath: string) {
+    
+  }
+  deleteProfileImage(userId: any) {
+    
+  }
 }
 
 export default UserService;

@@ -261,49 +261,48 @@ function UpdateUser(): JSX.Element {
   const handleSubmitData = useCallback(
     (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
       event.preventDefault();
-      // let valid = true;
+      let valid = true;
 
-      // let validEmail =
-      //   validate.exists(email) &&
-      //   validate.has(email, { specialChar: true }).length == 0;
+      let validEmail =
+        validate.exists(email) &&
+        validate.has(email, { specialChar: true }).length == 0;
 
-      // let validUserName = validate.exists(userName);
-      // let validName = validate.exists(name);
-      // let validPhone = validate.exists(phone);
-      // let validPassword =
-      //   validate.exists(password) &&
-      //   validate.has(password, {
-      //     minLenght: 8,
-      //     specialChar: true,
-      //     digits: true,
-      //   }).length == 0;
+      let validUserName = validate.exists(userName);
+      let validName = validate.exists(name);
+      let validPhone = validate.exists(phone);
+      let validPassword =
+        validate.exists(password) &&
+        validate.has(password, {
+          minLenght: 8,
+          specialChar: true,
+          digits: true,
+        }).length == 0;
 
-      // if (!validPassword) {
-      //   valid = false;
-      // }
+      if (!validPassword) {
+        valid = false;
+      }
 
-      // if (password === confirmPassword || (!password && !confirmPassword)) {
-      //   valid = true;
-      // }
+      if (password === confirmPassword || (!password && !confirmPassword)) {
+        valid = true;
+      }
 
-      // if (!validName || !validEmail || !validUserName || !validPhone) {
-      //   valid = false;
-      // }
+      if (!validName || !validEmail || !validUserName || !validPhone) {
+        valid = false;
+      }
 
-      const valid = true;
       if (valid) {
         (async () => {
           let url = "/graphql";
-          // const mutation = updateUserMutation(
-          //   ["id", "userName", "name", "email", "phone"],
-          //   {
-          //     userName,
-          //     name,
-          //     email,
-          //     phone,
-          //   }
-          // );
-          // let data = { query: mutation };
+          const mutation = updateUserMutation(
+            ["id", "userName", "name", "email", "phone"],
+            {
+              userName,
+              name,
+              email,
+              phone,
+            }
+          );
+          let data = { query: mutation };
           let config: AxiosRequestConfig = {
             baseURL: "http://localhost:3000",
             responseType: "json",
@@ -316,31 +315,31 @@ function UpdateUser(): JSX.Element {
           };
 
           try {
-            // const response = await axios.post(url, data, config);
+            const response = await axios.post(url, data, config);
 
-            // if (response.status == 200) {
-            const formData = new FormData();
-            const blob = await (await fetch(profileImage)).blob();
-            const filename = `profile-${id}.${blob.type.split("/")[1]}`;
-            const image = new File([blob], filename, {
-              lastModified: new Date().getTime(),
-              type: blob.type,
-            });
+            if (response.status == 200) {
+              const formData = new FormData();
+              const blob = await (await fetch(profileImage)).blob();
+              const filename = `profile-${id}.${blob.type.split("/")[1]}`;
+              const image = new File([blob], filename, {
+                lastModified: new Date().getTime(),
+                type: blob.type,
+              });
 
-            url = "/upload/profile";
-            formData.append("userId", String(id));
-            formData.append("profile", image);
-            config = {
-              baseURL: "http://localhost:3000",
-              headers: {
-                Accept: "application/json",
-                "Content-Type": "multipart/form-data",
-                Authorization: "Bearer token",
-              },
-            };
+              url = "/upload/profile";
+              formData.append("userId", String(id));
+              formData.append("profile", image);
+              config = {
+                baseURL: "http://localhost:3000",
+                headers: {
+                  Accept: "application/json",
+                  "Content-Type": "multipart/form-data",
+                  Authorization: "Bearer token",
+                },
+              };
 
-            const responseUpload = await axios.post(url, formData, config);
-            // }
+              const responseUpload = await axios.post(url, formData, config);
+            }
           } catch (err) {
             console.log(err);
           }

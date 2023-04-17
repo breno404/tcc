@@ -12,8 +12,15 @@ uploadRouter.post(
   ProfileController.uploadProfileImageToUserById
 );
 
-uploadRouter.put("/profile", upload.single("profile"));
+uploadRouter.put(
+  "/profile",
+  upload.single("profile"),
+  ProfileController.uploadProfileImageToUserById
+);
 
-uploadRouter.delete("/profile", upload.single("profile"));
+uploadRouter.delete(
+  "/profile",
+  ProfileController.deleteProfileImageFromUserById
+);
 
 export default uploadRouter;

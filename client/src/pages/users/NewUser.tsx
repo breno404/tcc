@@ -14,6 +14,7 @@ import PhoneInput from "@/components/inputs/PhoneInput";
 import PasswordInput from "@/components/inputs/PasswordInput";
 import TextInput from "@/components/inputs/TextInput";
 import validate from "@/helpers/validate";
+import { createUser as createUserMutation } from "@/graphQL/index";
 
 const Style = styled.div`
   display: flex;
@@ -241,42 +242,55 @@ function NewUser(): JSX.Element {
 
       if (valid) {
         (async () => {
-          const url = "";
-          const data = { userName, name, email, phone, password };
-          const config: AxiosRequestConfig = {
-            baseURL: "baseUrl",
+          let url = "/graphql";
+          const mutation = createUserMutation(
+            ["id", "userName", "name", "email", "phone"],
+            {
+              userName,
+              name,
+              email,
+              phone,
+            }
+          );
+          let data = { query: mutation };
+          let config: AxiosRequestConfig = {
+            baseURL: "http://localhost:3000",
             responseType: "json",
             headers: {
               Accept: "application/json",
               "Content-Type":
                 "application/json;application/x-www-form-urlencoded",
-              "User-Agent": window.navigator.userAgent,
               Authorization: "Bearer token",
             },
           };
 
           try {
             const response = await axios.post(url, data, config);
-            const url2 = "";
-            const formData = new FormData();
 
-            const image = await fetch(profileImage).then((r) => r.blob());
-
-            formData.append("profile", image);
-
-            const config2: AxiosRequestConfig = {
-              baseURL: "baseUrl",
-              responseType: "json",
-              headers: {
-                Accept: "application/json",
-                "Content-Type": "multipart/form-data",
-                "User-Agent": window.navigator.userAgent,
-                Authorization: "Bearer token",
-              },
-            };
+            const user = response.data.user;
 
             if (response.status == 200) {
-              const response2 = await axios.post(url2, data, config2);
+              const formData = new FormData();
+              const blob = await (await fetch(profileImage)).blob();
+              const filename = `profile-${user.id}.${blob.type.split("/")[1]}`;
+              const image = new File([blob], filename, {
+                lastModified: new Date().getTime(),
+                type: blob.type,
+              });
+
+              url = "/upload/profile";
+              formData.append("userId", String(user.id));
+              formData.append("profile", image);
+              config = {
+                baseURL: "http://localhost:3000",
+                headers: {
+                  Accept: "application/json",
+                  "Content-Type": "multipart/form-data",
+                  Authorization: "Bearer token",
+                },
+              };
+
+              const responseUpload = await axios.post(url, formData, config);
             }
           } catch (err) {
             console.log(err);

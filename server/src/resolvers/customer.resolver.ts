@@ -46,10 +46,7 @@ class UserResolver {
   @Mutation(() => Boolean)
   async deleteUser(@Arg("id") id: string): Promise<boolean> {
     const service = new UserService();
-    const user = await service.updateUser(id, { active: false });
-
-    if (user?.active) return false;
-    return true;
+    return service.deleteUser(id);
   }
 }
 

@@ -1,4 +1,5 @@
 import { ObjectType, Field, ID } from "type-graphql";
+import { File } from "./files.type";
 
 @ObjectType()
 class User {
@@ -19,6 +20,12 @@ class User {
 
   @Field()
   password: string;
+
+  @Field()
+  active: boolean;
+
+  @Field()
+  profile?: File;
 }
 
 export { User };

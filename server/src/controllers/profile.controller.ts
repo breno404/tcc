@@ -1,7 +1,8 @@
 import { Request, Response } from "express";
 import UploadService from "../services/upload.service";
 import fs from "fs";
-import path from 'path'
+import path from "path";
+import UserService from "../services/user.service";
 
 abstract class ProfileController {
   static async getProfileImageFromUserById(req: Request, res: Response) {
@@ -19,27 +20,40 @@ abstract class ProfileController {
     if (!profile)
       return res.status(400).send("Request was submited without a file.");
 
-    const uploadService = new UploadService(path.resolve(__dirname, "../", "../", "uploads",userId));
+    const userService = new UserService();
+    const uploadService = new UploadService(
+      path.resolve(__dirname, "../", "../", "uploads", userId)
+    );
+    const user = await userService.findUserById(userId);
+
+    if (!user) {
+      return res.status(404).send("User not found.");
+    }
+
+    const existsOldProfilePath = fs.existsSync(user.profile?.path as string);
+
     const profileStream = fs.createReadStream(profile.path);
-    uploadService.upload(profileStream);
+    let destPath: string;
+
+    if (existsOldProfilePath) {
+      const oldProfileStream = fs.createWriteStream(
+        user.profile?.path as string
+      );
+      destPath = await uploadService.upload(profileStream, oldProfileStream);
+    } else destPath = await uploadService.upload(profileStream);
+
+    await userService.syncProfileImageById(userId, destPath);
 
     return res.status(200).send("The profile was submited with success.");
   }
 
-  static async uploadExistingProfileImageToUserById(req, res) {
-    const file = req.file;
-    if (!file) {
-      return res.status(400).send("Selecione um arquivo para enviar");
-    }
-    res.send("Arquivo enviado com sucesso");
-  }
-
   static async deleteProfileImageFromUserById(req, res) {
-    const file = req.file;
-    if (!file) {
-      return res.status(400).send("Selecione um arquivo para enviar");
-    }
-    res.send("Arquivo enviado com sucesso");
+    const userId = req.body.userId;
+
+    const userService = new UserService();
+
+    userService.deleteProfileImage(userId);
+    res.send("Arquivo deletado com sucesso");
   }
 }
 
