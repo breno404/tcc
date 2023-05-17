@@ -3,7 +3,7 @@ import { CookiesProvider } from "react-cookie";
 import Theme from "@/components/Theme";
 import GlobalStyle from "./globalStyle";
 import { RouterProvider } from "react-router-dom";
-import router from "./router";
+import router from "./routes/router";
 
 function App() {
   return (

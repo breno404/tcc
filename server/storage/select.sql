@@ -1,23 +1,67 @@
-SELECT
-    products.id,
-    products.name,
-    products.price,
-    products.category,
-    inventories.quantity
-FROM
-    inventories
-    INNER JOIN products ON inventories.productId = products.id
-ORDER BY
-    ASC products.category;
+-- SELECT
+--     products.id,
+--     products.name,
+--     products.price,
+--     products.category,
+--     inventories.quantity
+-- FROM
+--     inventories
+--     INNER JOIN products ON inventories.productId = products.id
+-- ORDER BY
+--     ASC products.category;
+-- SELECT
+--     *
+-- FROM
+--     users;
 
-    -- DROP TABLE users;
-    -- DROP TABLE files;
-    -- DROP TABLE categories;
-    -- DROP TABLE files_categories;
-    -- DROP TABLE files_users;
-    -- DROP TABLE customers;
-    -- DROP TABLE suppliers;
-    -- DROP TABLE products;
-    -- DROP TABLE inventories;
-    -- DROP TABLE purchases;
-    -- DROP TABLE sales;
+-- SELECT
+--     *
+-- FROM
+--     files;
+
+-- SELECT
+--     *
+-- FROM
+--     categories;
+
+-- SELECT
+--     *
+-- FROM
+--     files_categories;
+
+-- SELECT
+--     *
+-- FROM
+--     files_users;
+
+-- SELECT
+--     *
+-- FROM
+--     customers;
+
+-- SELECT
+--     *
+-- FROM
+--     suppliers;
+
+-- SELECT
+--     *
+-- FROM
+--     products;
+
+-- SELECT
+--     *
+-- FROM
+--     inventories;
+
+-- SELECT
+--     *
+-- FROM
+--     purchases;
+
+-- SELECT
+--     *
+-- FROM
+--     sales;
+
+select * from customers where id = '59b7b7ef-af61-4244-8e5f-93c36a82710b';

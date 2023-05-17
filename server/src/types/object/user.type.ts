@@ -6,25 +6,25 @@ class User {
   @Field(() => ID)
   id: string;
 
-  @Field()
+  @Field(() => String, { nullable: true })
   name: string;
 
-  @Field()
+  @Field(() => String, { nullable: true })
   phone: string;
 
-  @Field()
+  @Field(() => String, { nullable: false })
   userName: string;
 
-  @Field()
+  @Field(() => String, { nullable: false })
   email: string;
 
-  @Field()
+  @Field(() => String, { nullable: false })
   password: string;
 
-  @Field()
+  @Field(() => Boolean, { nullable: false })
   active: boolean;
 
-  @Field()
+  @Field(() => File, { nullable: true })
   profile?: File;
 }
 

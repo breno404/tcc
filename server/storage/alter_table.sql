@@ -1,2 +1,5 @@
 ALTER TABLE users
     ADD COLUMN active BIT NOT NULL DEFAULT 1;
+
+DROP TABLE customers;
+

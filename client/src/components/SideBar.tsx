@@ -31,6 +31,13 @@ const Style = styled.aside<{ mode: "main" | "light" | "dark" }>`
     padding: 0.5rem 1rem;
   }
 
+  & .profile {
+    border-top: 2px solid #1e3852;
+    padding: 0.5rem 1rem;
+    font-size: 1.5rem;
+    cursor: default;
+  }
+
   & a,
   a:hover,
   a:active,
@@ -105,7 +112,7 @@ function SideBar({ open }: SideBarProps): React.ReactElement {
             { name: "Usuários", href: "users" },
           ]}
         />
-        <li>{user?.name}</li>
+        <li className="profile">{user?.name}</li>
       </ul>
     </Style>
   );

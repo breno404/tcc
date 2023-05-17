@@ -50,9 +50,18 @@ CREATE TABLE
 CREATE TABLE
     customers (
         id VARCHAR(255) NOT NULL,
-        companyName VARCHAR(100),
-        entityType cnae VARCHAR(100),
+        companyName VARCHAR(255),
+        fantasyName VARCHAR(255) DEFAULT NULL,
+        cnae VARCHAR(255),
+        entityType VARCHAR(255),
         cnpj CHAR(18),
+        cep CHAR(9) DEFAULT NULL,
+        district VARCHAR(255) DEFAULT NULL,
+        street VARCHAR(255) DEFAULT NULL,
+        streetNumber VARCHAR(255) DEFAULT NULL,
+        city VARCHAR(255) DEFAULT NULL,
+        phone VARCHAR(14) DEFAULT NULL,
+        email VARCHAR(255) DEFAULT NULL,
         PRIMARY KEY (id)
     );
 

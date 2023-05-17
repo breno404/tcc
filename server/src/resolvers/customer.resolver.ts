@@ -1,53 +1,64 @@
-import { Resolver, Query, Arg, Mutation } from "type-graphql";
-import { UserInput } from "../types/input/user.input";
-import { User as UserType } from "../types/object/user.type";
-import UserService from "../services/user.service";
+import { Resolver, Query, Arg, Mutation, Field, ID } from "type-graphql";
+import { CustomerInput } from "../types/input/customer.input";
+import { Customer as CustomerType } from "../types/object/customer.type";
+import CustomerService from "../services/customer.service";
 import LoggerService from "../services/logger.service";
 
-@Resolver(UserType)
-class UserResolver {
-  @Query(() => UserType, { nullable: true })
-  async userById(@Arg("id") id: string): Promise<UserType | null> {
-    const service = new UserService();
-    return service.findUserById(id);
+@Resolver(CustomerType)
+class CustomerResolver {
+  @Query(() => CustomerType, { nullable: true })
+  async customerById(@Arg("id") id: string): Promise<CustomerType | null> {
+    const service = new CustomerService();
+    return service.findCustomerById(id);
   }
 
-  @Query(() => UserType, { nullable: true })
-  async userByEmail(@Arg("email") email: string): Promise<UserType | null> {
-    const service = new UserService();
-    return service.findUserByEmail(email);
+  @Query(() => CustomerType, { nullable: true })
+  async customerByCnpj(
+    @Arg("cnpj") cnpj: string
+  ): Promise<CustomerType | null> {
+    const service = new CustomerService();
+    return service.findCustomerByCnpj(cnpj);
   }
 
-  @Query(() => [UserType], { nullable: true })
-  async users(): Promise<UserType[]> {
-    const service = new UserService();
-    return service.findAllUsers();
+  @Query(() => CustomerType, { nullable: true })
+  async customerByName(
+    @Arg("name") name: string
+  ): Promise<CustomerType | null> {
+    const service = new CustomerService();
+    return service.findCustomerByName(name);
+  }
+
+  @Query(() => [CustomerType], { nullable: true })
+  async customers(): Promise<CustomerType[]> {
+    const service = new CustomerService();
+    return service.findAllCustomers();
   }
 
   //---------------------------------------------------------------------------
-  @Mutation(() => UserType)
-  async createUser(
+  @Mutation(() => CustomerType)
+  async createCustomer(
     @Arg("data", { validate: { forbidUnknownValues: false } })
-    data: UserInput
-  ): Promise<UserType | null> {
-    const service = new UserService();
-    return service.createUser(data);
+    data: CustomerInput
+  ): Promise<CustomerType | null> {
+    const service = new CustomerService();
+    return service.createCustomer(data);
   }
 
-  @Mutation(() => UserType)
-  async updateUser(
+  @Mutation(() => CustomerType)
+  async updateCustomer(
     @Arg("id") id: string,
-    @Arg("data", { validate: { forbidUnknownValues: false } }) data: UserInput
-  ): Promise<UserType | null> {
-    const service = new UserService();
-    return service.updateUser(id, data);
+    @Arg("data", { validate: { forbidUnknownValues: false } })
+    data: CustomerInput
+  ): Promise<CustomerType | null> {
+    const service = new CustomerService();
+    return service.updateCustomer(id, data);
   }
 
   @Mutation(() => Boolean)
-  async deleteUser(@Arg("id") id: string): Promise<boolean> {
-    const service = new UserService();
-    return service.deleteUser(id);
+  async deleteCustomer(@Arg("id") id: string): Promise<boolean> {
+    const service = new CustomerService();
+    return service.deleteCustomer(id);
   }
 }
 
-export { UserResolver };
+export { CustomerResolver };

@@ -15,6 +15,7 @@ function useGraphQL<T>(options: Options) {
   const [isLoading, setIsLoading] = useState(false);
 
   const doRequest = useCallback(() => {
+    console.log(options.query);
     setIsLoading(true);
     axios
       .post(

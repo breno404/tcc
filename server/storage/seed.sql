@@ -25,3 +25,32 @@ VALUES
         'pedro@example.com',
         '79617E2E9D51A353D2639A9F02D439FD713C0D2FB947A47C1541051E8E95C2BE'
     );
+
+INSERT INTO
+    customers (
+        id,
+        companyName,
+        fantasyName,
+        cnae,
+        entityType,
+        cnpj,
+        cep,
+        district,
+        street,
+        streetNumber,
+        city
+    )
+VALUES
+    (
+        '59b7b7ef-af61-4244-8e5f-93c36a82710b',
+        'CONNECTCOM TELEINFORMATICA COMERCIO E SERVICOS LTDA',
+        'CONNECTCOM TELEINFORMATICA',
+        '6209100: SUPORTE TÉCNICO, MANUTENÇÃO E OUTROS SERVIÇOS EM TECNOLOGIA DA INFORMAÇÃO',
+        'SOCIEDADE EMPRESÁRIA LIMITADA',
+        '00.308.141/0001-76',
+        '04004-040',
+        'PARAISO',
+        'AVENIDA BERNARDINO DE CAMPOS',
+        '98',
+        'São Paulo'
+    );
