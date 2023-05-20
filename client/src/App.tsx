@@ -8,6 +8,7 @@ import router from "./routes/router";
 function App() {
   return (
     <React.StrictMode>
+      );
       <CookiesProvider>
         <Theme>
           <RouterProvider router={router} />

@@ -1,7 +1,21 @@
 import Breadcrumb from "@/components/Breadcrumb";
 import styled from "styled-components";
 import profileImgDefault from "@/assets/profile.webp";
-import { useCallback, useState } from "react";
+import {
+  ChangeEvent,
+  MouseEventHandler,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
+import PhoneInput from "@/components/inputs/PhoneInput";
+import TextInput from "@/components/inputs/TextInput";
+import validate from "@/helpers/validate";
+import useGraphQL from "@/hooks/useGraphQL";
+import { createCustomer as createCustomerMutation } from "@/graphQL/index";
+import { useParams } from "react-router-dom";
+import axios, { AxiosRequestConfig } from "axios";
 
 const Style = styled.div`
   display: flex;
@@ -62,221 +76,472 @@ const StyledButton = styled.button<{
     backgroundColor == "default" ? "#fff" : "#000"};
 `;
 
-const Button = ({ backgroundColor, label, onClick }: any) => {
+type ButtonProps = {
+  backgroundColor: "default" | "transparent";
+  label: string;
+  onClick: MouseEventHandler<HTMLButtonElement>;
+};
+
+const Button = ({ backgroundColor, label, onClick }: ButtonProps) => {
   return (
-    <StyledButton backgroundColor={backgroundColor} onClick={onClick}>
+    <StyledButton
+      backgroundColor={backgroundColor}
+      type="button"
+      onClick={onClick}
+    >
       <p>{label}</p>
     </StyledButton>
   );
 };
 
-const StyledInput = styled.fieldset`
-  flex: 1;
-  margin: 1rem 0 0 1rem;
-  padding: 0 1rem 1rem 0;
-  font-size: 1.4rem;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  & input {
-    height: 3rem;
-    border: 1px solid #dedede;
-    outline: none;
-    padding: 0 5px;
-    border-radius: 5px;
-  }
-
-  & input:focus {
-    border: 1px solid #4da6ff;
-  }
-`;
-
-const StyledProfile = styled.fieldset`
+const StyledProfile = styled.fieldset<{ src: string; srcDefault: string }>`
   margin-bottom: 2rem;
   & input[type="file"] {
     display: none;
   }
 
   & .profile {
-    max-width: 150px;
-    max-height: 150px;
-    border-radius: 50%;
+    width: 200px;
+    height: 200px;
     overflow: hidden;
     border: 1px solid #dee2e6;
     cursor: pointer;
-  }
-
-  & .profile img {
-    max-width: 100%;
+    background-image: ${({ src, srcDefault }) => {
+      return src && src != "" ? `url(${src});` : `url(${srcDefault});`;
+    }};
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-color: #dedede;
   }
 `;
 
-type InputProps = {
+type ProfileProps = {
   htmlFor: string;
-  onChange: (event: any) => void;
+  onChangeCallBack: (value: File | null) => void;
   id: string;
   name: string;
-  value: string | number;
-  label: string;
-  type?: string;
+  src: string;
+  srcDefault: string;
 };
 
-const Input = ({
-  htmlFor,
-  onChange,
-  id,
-  name,
-  value,
-  label,
-  type,
-}: InputProps) => {
+const Profile = (props: ProfileProps) => {
+  const [file, setFile] = useState<File | null>(null);
+  const accept = ["image/png", "image/jpeg", "image/webp"].join(", ");
+
+  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files) {
+      const [photo] = event.target.files;
+      setFile(photo);
+    }
+  };
+
+  useEffect(() => {
+    props.onChangeCallBack(file);
+  }, [file]);
+
   return (
-    <StyledInput>
-      <label htmlFor={htmlFor}>
-        <p>{label}</p>
+    <StyledProfile src={props.src} srcDefault={props.srcDefault}>
+      <label htmlFor={props.htmlFor}>
+        <div className="profile"></div>
         <input
-          id={id}
-          name={name}
-          type={type || "text"}
-          value={value}
-          onChange={onChange}
+          id={props.id}
+          name={props.name}
+          type="file"
+          onChange={handleChange}
+          accept={accept}
         />
-      </label>
-    </StyledInput>
-  );
-};
-
-const Profile = ({ htmlFor, onChange, id, name, value, src }: any) => {
-  return (
-    <StyledProfile>
-      <label htmlFor={htmlFor}>
-        <div className="profile">
-          <img src={src} alt={name} />
-        </div>
-        <input id={id} name={name} type="file" onChange={onChange} />
       </label>
     </StyledProfile>
   );
 };
 
-function NewUser(): JSX.Element {
-  const [profileImage, setpProfileImage] = useState(profileImgDefault);
-  const [userName, setUserName] = useState("");
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
+const CNPJCEPSection = styled.section`
+  display: flex;
+  flex-direction: row;
+  @media screen and (min-width: 820px) {
+    flex-direction: column;
+  }
+`;
+
+type CustomerQueryResponse = {
+  customer: {
+    id?: string;
+    companyName?: string;
+    fantasyName?: string;
+    cnae?: string;
+    entityType?: string;
+    cnpj?: string;
+    cep?: string;
+    district?: string;
+    street?: string;
+    streetNumber?: string;
+    city?: string;
+    phone?: string;
+    email?: string;
+  };
+};
+
+function NewCustomer(): JSX.Element {
+  //------------------------------------------------------------
+  const [profileImage, setProfileImage] = useState("");
+  const [companyName, setCompanyName] = useState("");
+  const [fantasyName, setFantasyName] = useState("");
+  const [cnae, setCnae] = useState("");
+  const [entityType, setEntityType] = useState("");
+  const [cnpj, setCnpj] = useState("");
+  const [cep, setCep] = useState("");
+  const [district, setDistrict] = useState("");
+  const [street, setStreet] = useState("");
+  const [streetNumber, setStreetNumber] = useState("");
+  const [city, setCity] = useState("");
   const [phone, setPhone] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const [email, setEmail] = useState("");
 
-  const handleChangeProfilePhoto = useCallback(
-    (event: any) => {
-      if (event.target.files) {
-        const [photo] = event.target.files;
-
-        setpProfileImage(URL.createObjectURL(photo));
+  const handleChangeProfileCallBack = useCallback(
+    (photo: File | null) => {
+      if (photo) {
+        setProfileImage(URL.createObjectURL(photo));
+      } else {
+        setProfileImage("");
       }
     },
     [profileImage]
   );
 
-  const handleChangeUserName = (event: any) => {
-    const val = event.currentTarget.value;
-    setUserName(val);
+  const handleChangeCompanyNameCallBack = (value: string) => {
+    setCompanyName(value);
   };
-  const handleChangeName = (event: any) => {
-    const val = event.currentTarget.value;
-    setName(val);
+  const handleChangeFantasyNameCallBack = (value: string) => {
+    setFantasyName(value);
   };
-  const handleChangeEmail = (event: any) => {
-    const val = event.currentTarget.value;
-    setEmail(val);
+  const handleChangeEmailCallBack = (value: string) => {
+    setEmail(value);
   };
-  const handleChangePhone = (event: any) => {
-    const val = event.currentTarget.value;
-    setPhone(val);
+  const handleChangePhoneCallBack = (value: string) => {
+    setPhone(value);
   };
-  const handleChangePassword = (event: any) => {
-    const val = event.currentTarget.value;
-    setPassword(val);
+  const handleChangeCnaeCallBack = (value: string) => {
+    setCnae(value);
   };
-  const handleChangeConfirmPassword = (event: any) => {
-    const val = event.currentTarget.value;
-    setConfirmPassword(val);
+  const handleChangeCnpjCallBack = (value: string) => {
+    setCnpj(value);
   };
+  const handleChangeEntityTypeCallBack = (value: string) => {
+    setEntityType(value);
+  };
+  const handleChangeCepCallBack = (value: string) => {
+    setCep(value);
+  };
+  const handleChangeDistrictCallBack = (value: string) => {
+    setDistrict(value);
+  };
+  const handleChangeStreetCallBack = (value: string) => {
+    setStreet(value);
+  };
+  const handleChangeStreetNumberCallBack = (value: string) => {
+    setStreetNumber(value);
+  };
+  const handleChangeCityCallBack = (value: string) => {
+    setCity(value);
+  };
+
+  const handleClearForm = (
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
+    event.preventDefault();
+    setProfileImage("");
+    setCompanyName("");
+    setFantasyName("");
+    setCnae("");
+    setEntityType("");
+    setCnpj("");
+    setCep("");
+    setDistrict("");
+    setStreet("");
+    setStreetNumber("");
+    setCity("");
+    setPhone("");
+    setEmail("");
+  };
+
+  const handleSubmitData = useCallback(
+    (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+      event.preventDefault();
+      let valid = true;
+
+      let validCompanyName = validate.exists(companyName);
+      let validFantasyName = validate.exists(fantasyName);
+      let validCnae = validate.exists(cnae);
+      let validEntityType = validate.exists(entityType);
+      let validCnpj = validate.exists(cnpj);
+      let validCep = validate.exists(cep);
+      let validDistrict = validate.exists(district);
+      let validStreet = validate.exists(street);
+      let validStreetNumber = validate.exists(streetNumber);
+      let validCity = validate.exists(city);
+      let validPhone = validate.exists(phone);
+      let validEmail = validate.exists(email);
+
+      if (
+        !validCompanyName ||
+        !validCnae ||
+        !validEntityType ||
+        !validCnpj ||
+        !validCep ||
+        !validDistrict ||
+        !validEmail ||
+        !validStreet ||
+        !validStreetNumber ||
+        !validCity ||
+        !validPhone
+      ) {
+        valid = false;
+      }
+
+      if (valid) {
+        (async () => {
+          let url = "/graphql";
+          const mutation = createCustomerMutation(
+            [
+              "id",
+              "companyName",
+              "fantasyName",
+              "cnae",
+              "entityType",
+              "cnpj",
+              "cep",
+              "district",
+              "street",
+              "streetNumber",
+              "city",
+              "phone",
+              "email",
+            ],
+            {
+              companyName,
+              fantasyName,
+              cnae,
+              entityType,
+              cnpj,
+              cep,
+              district,
+              street,
+              streetNumber,
+              city,
+              phone,
+              email,
+            }
+          );
+          let data = { query: mutation };
+          let config: AxiosRequestConfig = {
+            baseURL: "http://localhost:3000",
+            responseType: "json",
+            headers: {
+              Accept: "application/json",
+              "Content-Type":
+                "application/json;application/x-www-form-urlencoded",
+              Authorization: "Bearer token",
+            },
+          };
+
+          try {
+            const response = await axios.post(url, data, config);
+            console.log(response);
+            if (response.status == 200) {
+              const customerId = response.data.customer.id;
+
+              const formData = new FormData();
+              const blob = await (await fetch(profileImage)).blob();
+              const filename = `profile-${customerId}.${
+                blob.type.split("/")[1]
+              }`;
+              const image = new File([blob], filename, {
+                lastModified: new Date().getTime(),
+                type: blob.type,
+              });
+
+              url = "/upload/profile";
+              formData.append("customerId", String(customerId));
+              formData.append("profile", image);
+              config = {
+                baseURL: "http://localhost:3000",
+                headers: {
+                  Accept: "application/json",
+                  "Content-Type": "multipart/form-data",
+                  Authorization: "Bearer token",
+                },
+              };
+
+              const responseUpload = await axios.post(url, formData, config);
+            }
+          } catch (err) {
+            console.log(err);
+          }
+        })();
+      } else {
+        console.log("Corrija alguns campos antes de enviar a requisição.");
+      }
+    },
+    [
+      profileImage,
+      companyName,
+      fantasyName,
+      cnae,
+      entityType,
+      cnpj,
+      cep,
+      district,
+      street,
+      streetNumber,
+      city,
+      phone,
+      email,
+    ]
+  );
 
   return (
     <>
       <Breadcrumb />
       <Style>
         <div>
-          <form>
+          <form action="post" onSubmit={(event) => event.preventDefault()}>
             <section>
-              <Profile
-                id="profile"
-                name="profile"
-                htmlFor="profile"
-                src={profileImage}
-                value={""}
-                onChange={handleChangeProfilePhoto}
-              />
+              <section>
+                <Profile
+                  id="profile"
+                  name="profile"
+                  htmlFor="profile"
+                  src={profileImage}
+                  srcDefault={profileImgDefault}
+                  onChangeCallBack={handleChangeProfileCallBack}
+                />
+              </section>
+              <section
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <section>
+                  <TextInput
+                    id="companyName"
+                    name="companyName"
+                    htmlFor="companyName"
+                    label="Razão Social"
+                    value={companyName}
+                    onChangeCallBack={handleChangeCompanyNameCallBack}
+                  />
+                  <TextInput
+                    id="fantasyName"
+                    name="fantasyName"
+                    htmlFor="fantasyName"
+                    label="Nome Fantasia"
+                    value={fantasyName}
+                    onChangeCallBack={handleChangeFantasyNameCallBack}
+                  />
+                </section>
+                <section>
+                  <TextInput
+                    id="entityType"
+                    name="entityType"
+                    htmlFor="entityType"
+                    label="Natureza Jurídica"
+                    value={entityType}
+                    onChangeCallBack={handleChangeEntityTypeCallBack}
+                  />
+                  <TextInput
+                    id="cnae"
+                    name="cnae"
+                    htmlFor="cnae"
+                    label="CNAE"
+                    value={cnae}
+                    onChangeCallBack={handleChangeCnaeCallBack}
+                  />
+                </section>
+                <section>
+                  <TextInput
+                    id="email"
+                    name="email"
+                    htmlFor="email"
+                    type="email"
+                    label="E-mail"
+                    value={email}
+                    onChangeCallBack={handleChangeEmailCallBack}
+                  />
+                  <PhoneInput
+                    id="phone"
+                    name="phone"
+                    htmlFor="phone"
+                    label="Telefone"
+                    value={phone}
+                    type="tel"
+                    onChangeCallBack={handleChangePhoneCallBack}
+                  />
+                </section>
+              </section>
             </section>
             <section>
-              <Input
-                id="user"
-                name="user"
-                htmlFor="user"
-                label="Usuário"
-                value={userName}
-                onChange={handleChangeUserName}
-              />
-              <Input
-                id="name"
-                name="name"
-                htmlFor="name"
-                label="Nome"
-                value={name}
-                onChange={handleChangeName}
-              />
+              <CNPJCEPSection>
+                <TextInput
+                  id="cnpj"
+                  name="cnpj"
+                  htmlFor="cnpj"
+                  label="CNPJ"
+                  value={cnpj}
+                  onChangeCallBack={handleChangeCnpjCallBack}
+                />
+                <TextInput
+                  id="cep"
+                  name="cep"
+                  htmlFor="cep"
+                  label="CEP"
+                  value={cep}
+                  onChangeCallBack={handleChangeCepCallBack}
+                />
+              </CNPJCEPSection>
+              <section style={{ display: "flex", flexDirection: "column" }}>
+                <section>
+                  <TextInput
+                    id="street"
+                    name="street"
+                    htmlFor="street"
+                    label="Logradouro"
+                    value={street}
+                    onChangeCallBack={handleChangeStreetCallBack}
+                  />
+                  <TextInput
+                    id="streetNumber"
+                    name="streetNumber"
+                    htmlFor="streetNumber"
+                    label="Nº Logradouro"
+                    value={streetNumber}
+                    onChangeCallBack={handleChangeStreetNumberCallBack}
+                  />
+                </section>
+                <section>
+                  <TextInput
+                    id="district"
+                    name="district"
+                    htmlFor="district"
+                    label="Bairro"
+                    value={district}
+                    onChangeCallBack={handleChangeDistrictCallBack}
+                  />
+                  <TextInput
+                    id="city"
+                    name="city"
+                    htmlFor="city"
+                    label="Municipio"
+                    value={city}
+                    onChangeCallBack={handleChangeCityCallBack}
+                  />
+                </section>
+              </section>
             </section>
-            <section>
-              <Input
-                id="email"
-                name="email"
-                htmlFor="email"
-                label="E-mail"
-                value={email}
-                onChange={handleChangeEmail}
-              />
-              <Input
-                id="phone"
-                name="phone"
-                htmlFor="phone"
-                label="Telefone"
-                value={phone}
-                onChange={handleChangePhone}
-              />
-            </section>
-            <section>
-              <Input
-                id="password"
-                name="password"
-                htmlFor="password"
-                label="Senha"
-                type="password"
-                value={password}
-                onChange={handleChangePassword}
-              />
-              <Input
-                id="confirmPassword"
-                name="confirmPassword"
-                htmlFor="confirmPassword"
-                label="Confirmar senha"
-                type="password"
-                value={confirmPassword}
-                onChange={handleChangeConfirmPassword}
-              />
-            </section>
+
             <section>
               <div
                 style={{ margin: "1rem 0 0 1rem", padding: "0 1rem 1rem 0" }}
@@ -284,7 +549,7 @@ function NewUser(): JSX.Element {
                 <Button
                   label="Salvar"
                   backgroundColor="default"
-                  onClick={() => {}}
+                  onClick={handleSubmitData}
                 />
               </div>
               <div
@@ -293,7 +558,7 @@ function NewUser(): JSX.Element {
                 <Button
                   label="Limpar"
                   backgroundColor="transparent"
-                  onClick={() => {}}
+                  onClick={handleClearForm}
                 />
               </div>
             </section>
@@ -304,4 +569,4 @@ function NewUser(): JSX.Element {
   );
 }
 
-export default NewUser;
+export default NewCustomer;

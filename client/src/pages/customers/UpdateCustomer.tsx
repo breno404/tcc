@@ -161,7 +161,8 @@ const Profile = (props: ProfileProps) => {
 
 const CNPJCEPSection = styled.section`
   display: flex;
-  @media (min-width: 603px) {
+  flex-direction: row;
+  @media screen and (min-width: 820px) {
     flex-direction: column;
   }
 `;
