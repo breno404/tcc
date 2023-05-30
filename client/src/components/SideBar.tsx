@@ -54,6 +54,7 @@ type MenuProps = {
       | "Fornecedores"
       | "Logística"
       | "Vendas"
+      | "Compras"
       | "Estoque"
       | "Dashboards"
       | "Agenda"
@@ -63,6 +64,7 @@ type MenuProps = {
       | "suppliers"
       | "logistics"
       | "sales"
+      | "purchases"
       | "inventory"
       | "dashboards"
       | "calendar"
@@ -109,6 +111,9 @@ function SideBar({ open }: SideBarProps): React.ReactElement {
           abas={[
             { name: "Clientes", href: "customers" },
             { name: "Fornecedores", href: "suppliers" },
+            { name: "Compras", href: "purchases" },
+            { name: "Vendas", href: "sales" },
+            { name: "Estoque", href: "inventory" },
             { name: "Usuários", href: "users" },
           ]}
         />

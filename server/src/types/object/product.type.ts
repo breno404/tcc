@@ -1,0 +1,21 @@
+import { ObjectType, Field, ID } from "type-graphql";
+
+@ObjectType()
+class Product {
+  @Field(() => ID)
+  id: string;
+
+  @Field(() => String)
+  name: string;
+
+  @Field(() => String, { nullable: true })
+  description: string;
+
+  @Field(() => String)
+  price: number;
+
+  @Field(() => String)
+  category: string;
+}
+
+export { Product };

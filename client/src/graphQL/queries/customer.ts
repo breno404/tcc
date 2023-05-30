@@ -1,4 +1,6 @@
-export const customers: CustomerFunction = (fields) => `
+import { gql } from "@apollo/client";
+
+export const customers = (fields: CustomerAttribute[]) => gql`
 query Customers {
   customers {
     ${fields.join("\n")}
@@ -6,27 +8,25 @@ query Customers {
 }
 `;
 
-export const customerById: CustomerFunction = (fields, variables) => `
-query CustomerById {
-  customer:customerById(id: "${variables?.id}") {
+export const customerById = (fields: CustomerAttribute[]) => gql`
+query CustomerById($id: String!) {
+  customer:customerById(id: $id}) {
     ${fields.join("\n")}
   }
 }
 `;
 
-export const customerByCnpj: CustomerFunction = (fields, variables) => `
-query CustomerByCnpj {
-  customer:customerByCnpj(cnpj: "${variables?.cnpj}") {
+export const customerByCnpj = (fields: CustomerAttribute[]) => gql`
+query CustomerByCnpj($cnpj: String!) {
+  customer:customerByCnpj(cnpj: $cnpj) {
     ${fields.join("\n")}
   }
 }
 `;
 
-export const customerByName: CustomerFunction = (fields, variables) => `
+export const customerByName = (fields: CustomerAttribute[]) => gql`
 query CustomerByName {
-  customer:customerByName(name: "${
-    variables?.fantasyName || variables?.companyName
-  }") {
+  customer:customerByName(name: $name) {
     ${fields.join("\n")}
   }
 }

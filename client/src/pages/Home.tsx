@@ -29,7 +29,7 @@ function Home() {
   return (
     <>
       <Breadcrumb />
-      <AdminPanel />
+      {/* <AdminPanel /> */}
       <Style>
         <div>
           <BarChart />

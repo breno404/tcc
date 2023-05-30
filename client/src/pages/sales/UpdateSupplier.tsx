@@ -13,10 +13,12 @@ import PhoneInput from "@/components/inputs/PhoneInput";
 import TextInput from "@/components/inputs/TextInput";
 import validate from "@/helpers/validate";
 import useGraphQL from "@/hooks/useGraphQL";
-import { createSupplier as supplierMutation } from "@/graphQL/index";
+import {
+  supplierById as supplierQuery,
+  updateSupplier as updateSupplierMutation,
+} from "@/graphQL/index";
 import { useParams } from "react-router-dom";
 import axios, { AxiosRequestConfig } from "axios";
-import { useMutation } from "@apollo/client";
 
 const Style = styled.div`
   display: flex;
@@ -183,7 +185,41 @@ type SupplierQueryResponse = {
   };
 };
 
-function NewSupplier(): JSX.Element {
+function UpdateSupplier(): JSX.Element {
+  const { id } = useParams();
+  const {
+    data: supplierResponse,
+    error,
+    doRequest: doSupplierRequest,
+  } = useGraphQL<SupplierQueryResponse>({
+    query: supplierQuery(
+      [
+        "id",
+        "companyName",
+        "fantasyName",
+        "cnae",
+        "entityType",
+        "cnpj",
+        "cep",
+        "district",
+        "street",
+        "streetNumber",
+        "city",
+        "phone",
+        "email",
+      ],
+      {
+        id: id || "",
+      }
+    ),
+    baseUrl: "http://127.0.0.1:3000/",
+    headers: { "Content-Type": "application/json" },
+  });
+
+  useMemo(() => {
+    if (id) doSupplierRequest();
+  }, [id]);
+
   //------------------------------------------------------------
   const [profileImage, setProfileImage] = useState("");
   const [companyName, setCompanyName] = useState("");
@@ -199,9 +235,24 @@ function NewSupplier(): JSX.Element {
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
 
-  const [createSupplier, { loading, error }] = useMutation(
-    supplierMutation(["id", "companyName", "cnpj"])
-  );
+  useMemo(() => {
+    const supplier = supplierResponse?.supplier;
+
+    if (supplier) {
+      setCompanyName(supplier.companyName || "");
+      setFantasyName(supplier.fantasyName || "");
+      setCnae(supplier.cnae || "");
+      setEntityType(supplier.entityType || "");
+      setCnpj(supplier.cnpj || "");
+      setCep(supplier.cep || "");
+      setDistrict(supplier.district || "");
+      setStreet(supplier.street || "");
+      setStreetNumber(supplier.streetNumber || "");
+      setCity(supplier.city || "");
+      setPhone(supplier.phone || "");
+      setEmail(supplier.email || "");
+    }
+  }, [supplierResponse]);
 
   const handleChangeProfileCallBack = useCallback(
     (photo: File | null) => {
@@ -306,47 +357,76 @@ function NewSupplier(): JSX.Element {
 
       if (valid) {
         (async () => {
-          const data = {
-            companyName,
-            cnae,
-            entityType,
-            cnpj,
-            cep,
-            district,
-            email,
-            street,
-            streetNumber,
-            city,
-            phone,
+          let url = "/graphql";
+          const mutation = updateSupplierMutation(
+            [
+              "id",
+              "companyName",
+              "fantasyName",
+              "cnae",
+              "entityType",
+              "cnpj",
+              "cep",
+              "district",
+              "street",
+              "streetNumber",
+              "city",
+              "phone",
+              "email",
+            ],
+            {
+              companyName,
+              fantasyName,
+              cnae,
+              entityType,
+              cnpj,
+              cep,
+              district,
+              street,
+              streetNumber,
+              city,
+              phone,
+              email,
+            }
+          );
+          let data = { query: mutation };
+          let config: AxiosRequestConfig = {
+            baseURL: "http://localhost:3000",
+            responseType: "json",
+            headers: {
+              Accept: "application/json",
+              "Content-Type":
+                "application/json;application/x-www-form-urlencoded",
+              Authorization: "Bearer token",
+            },
           };
 
           try {
-            const response = await createSupplier({ variables: { data } });
+            const response = await axios.post(url, data, config);
 
-            const supplierId = response.data.supplier.id;
+            if (response.status == 200) {
+              const formData = new FormData();
+              const blob = await (await fetch(profileImage)).blob();
+              const filename = `profile-${id}.${blob.type.split("/")[1]}`;
+              const image = new File([blob], filename, {
+                lastModified: new Date().getTime(),
+                type: blob.type,
+              });
 
-            const formData = new FormData();
-            const blob = await (await fetch(profileImage)).blob();
-            const filename = `profile-${supplierId}.${blob.type.split("/")[1]}`;
-            const image = new File([blob], filename, {
-              lastModified: new Date().getTime(),
-              type: blob.type,
-            });
+              url = "/upload/profile";
+              formData.append("supplierId", String(id));
+              formData.append("profile", image);
+              config = {
+                baseURL: "http://localhost:3000",
+                headers: {
+                  Accept: "application/json",
+                  "Content-Type": "multipart/form-data",
+                  Authorization: "Bearer token",
+                },
+              };
 
-            const url = "/upload/profile";
-            formData.append("supplierId", String(supplierId));
-            formData.append("profile", image);
-            const config = {
-              baseURL: "http://localhost:3000",
-              headers: {
-                Accept: "application/json",
-                "Content-Type": "multipart/form-data",
-                Authorization: "Bearer token",
-              },
-            };
-
-            const responseUpload = await axios.post(url, formData, config);
-            
+              const responseUpload = await axios.post(url, formData, config);
+            }
           } catch (err) {
             console.log(err);
           }
@@ -519,7 +599,7 @@ function NewSupplier(): JSX.Element {
                 style={{ margin: "1rem 0 0 1rem", padding: "0 1rem 1rem 0" }}
               >
                 <Button
-                  label="Salvar"
+                  label="Atualizar"
                   backgroundColor="default"
                   onClick={handleSubmitData}
                 />
@@ -541,4 +621,4 @@ function NewSupplier(): JSX.Element {
   );
 }
 
-export default NewSupplier;
+export default UpdateSupplier;

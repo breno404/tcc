@@ -54,3 +54,32 @@ VALUES
         '98',
         'São Paulo'
     );
+
+    INSERT INTO
+    suppliers (
+        id,
+        companyName,
+        fantasyName,
+        cnae,
+        entityType,
+        cnpj,
+        cep,
+        district,
+        street,
+        streetNumber,
+        city
+    )
+VALUES
+    (
+        '5baeb4dd-79e0-48c9-971e-a6769d5ec4d2',
+        'APPLE COMPUTER BRASIL LTDA',
+        'APPLE',
+        '46516 - COMÉRCIO ATACADISTA DE COMPUTADORES, PERIFÉRICOS E SUPRIMENTOS DE INFORMÁTICA',
+        'SOCIEDADE EMPRESÁRIA LIMITADA',
+        '00.623.904/0001-73',
+        '01454-901',
+        'ITAIM BIBI',
+        'R LEOPOLDO COUTO MAGALHAES JUNIOR',
+        '700',
+        'São Paulo'
+    );

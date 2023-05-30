@@ -1,33 +1,24 @@
-export const createCustomer: CustomerFunction = (fields, variables) => {
-  let data: string[] = Object.entries(Object(variables)).map(
-    (e) => `${e[0]}:${e[1]}`
-  );
-  return `
-    mutation CreateCustomer {
-      createCustomer(data: {${data.join(",\n")}) {
+import { gql } from "@apollo/client";
+
+export const createCustomer = (fields: CustomerAttribute[]) => gql`
+    mutation CreateCustomer($data: CustomerInput!) {
+      createCustomer(data: $data) {
         ${fields.join("\n")}
       }
     }
   `;
-};
 
-export const updateCustomer: CustomerFunction = (fields, variables) => {
-  const id = variables?.id;
-  delete variables?.id;
-  let data: string[] = Object.entries(Object(variables)).map(
-    (e) => `${e[0]}:${e[1]}`
-  );
-  return `
-    mutation UpdateCustomer {
-      updateCustomer(data: {${data.join(",\n")}, id: ${id}) {
+export const updateCustomer = (fields: CustomerAttribute[]) => gql`
+ 
+    mutation UpdateCustomer ($data: CustomerInput!, $id: String!){
+      updateCustomer(data: $data, id: $id) {
         ${fields.join("\n")}
       }
     }
   `;
-};
 
-export const deleteCustomer: CustomerFunction = (fields, variables) => `
-mutation DeleteCustomer {
-  deleteCustomer(id: ${variables?.id})
-}
+export const deleteCustomer = (fields: CustomerAttribute[]) => gql`
+  mutation DeleteCustomer($id: String!) {
+    deleteCustomer(id: $id)
+  }
 `;

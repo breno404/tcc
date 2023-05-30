@@ -5,7 +5,15 @@ import { details } from "./details";
 import { admin } from "./admin";
 import { layoutUsers } from "./users";
 import { layoutCustomers } from "./customers";
-import { Home, Layout, Login, NotFound, Signup } from "@/pages/index";
+import { layoutSuppliers } from "./suppliers";
+import {
+  Home,
+  Inventory,
+  Layout,
+  Login,
+  NotFound,
+  Signup,
+} from "@/pages/index";
 
 const home: RouteObject = {
   index: true,
@@ -14,6 +22,21 @@ const home: RouteObject = {
     return {
       breadcrumb: {
         routes: [{ name: "Home", href: "/" }],
+      },
+    };
+  },
+};
+
+const inventory: RouteObject = {
+  element: <Inventory />,
+  path: "inventory",
+  loader: async ({ request, params }) => {
+    return {
+      breadcrumb: {
+        routes: [
+          { name: "Home", href: "/" },
+          { name: "Estoque", href: "/inventory" },
+        ],
       },
     };
   },
@@ -29,11 +52,14 @@ const router = createBrowserRouter([
     element: <Layout />,
     children: [
       home,
+      inventory,
       details,
       admin,
+      inventory,
       layoutLogistics,
       layoutUsers,
       layoutCustomers,
+      layoutSuppliers,
     ],
   },
   login,

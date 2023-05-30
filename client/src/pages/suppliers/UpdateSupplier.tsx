@@ -12,13 +12,13 @@ import {
 import PhoneInput from "@/components/inputs/PhoneInput";
 import TextInput from "@/components/inputs/TextInput";
 import validate from "@/helpers/validate";
-import useGraphQL from "@/hooks/useGraphQL";
 import {
   supplierById as supplierQuery,
-  updateSupplier as updateSupplierMutation,
+  updateSupplier as supplierMutation,
 } from "@/graphQL/index";
 import { useParams } from "react-router-dom";
 import axios, { AxiosRequestConfig } from "axios";
+import { useMutation, useQuery } from "@apollo/client";
 
 const Style = styled.div`
   display: flex;
@@ -187,39 +187,43 @@ type SupplierQueryResponse = {
 
 function UpdateSupplier(): JSX.Element {
   const { id } = useParams();
-  const {
-    data: supplierResponse,
-    error,
-    doRequest: doSupplierRequest,
-  } = useGraphQL<SupplierQueryResponse>({
-    query: supplierQuery(
-      [
-        "id",
-        "companyName",
-        "fantasyName",
-        "cnae",
-        "entityType",
-        "cnpj",
-        "cep",
-        "district",
-        "street",
-        "streetNumber",
-        "city",
-        "phone",
-        "email",
-      ],
-      {
-        id: id || "",
-      }
-    ),
-    baseUrl: "http://127.0.0.1:3000/",
-    headers: { "Content-Type": "application/json" },
-  });
 
-  useMemo(() => {
-    if (id) doSupplierRequest();
-  }, [id]);
+  const { data: response } = useQuery(
+    supplierQuery([
+      "id",
+      "companyName",
+      "fantasyName",
+      "cnae",
+      "entityType",
+      "cnpj",
+      "cep",
+      "district",
+      "street",
+      "streetNumber",
+      "city",
+      "phone",
+      "email",
+    ]),
+    { variables: { id } }
+  );
 
+  const [updateSupplier] = useMutation(
+    supplierMutation([
+      "id",
+      "companyName",
+      "fantasyName",
+      "cnae",
+      "entityType",
+      "cnpj",
+      "cep",
+      "district",
+      "street",
+      "streetNumber",
+      "city",
+      "phone",
+      "email",
+    ])
+  );
   //------------------------------------------------------------
   const [profileImage, setProfileImage] = useState("");
   const [companyName, setCompanyName] = useState("");
@@ -236,7 +240,7 @@ function UpdateSupplier(): JSX.Element {
   const [email, setEmail] = useState("");
 
   useMemo(() => {
-    const supplier = supplierResponse?.supplier;
+    const supplier = response?.supplier;
 
     if (supplier) {
       setCompanyName(supplier.companyName || "");
@@ -252,7 +256,7 @@ function UpdateSupplier(): JSX.Element {
       setPhone(supplier.phone || "");
       setEmail(supplier.email || "");
     }
-  }, [supplierResponse]);
+  }, [response]);
 
   const handleChangeProfileCallBack = useCallback(
     (photo: File | null) => {
@@ -357,76 +361,44 @@ function UpdateSupplier(): JSX.Element {
 
       if (valid) {
         (async () => {
-          let url = "/graphql";
-          const mutation = updateSupplierMutation(
-            [
-              "id",
-              "companyName",
-              "fantasyName",
-              "cnae",
-              "entityType",
-              "cnpj",
-              "cep",
-              "district",
-              "street",
-              "streetNumber",
-              "city",
-              "phone",
-              "email",
-            ],
-            {
-              companyName,
-              fantasyName,
-              cnae,
-              entityType,
-              cnpj,
-              cep,
-              district,
-              street,
-              streetNumber,
-              city,
-              phone,
-              email,
-            }
-          );
-          let data = { query: mutation };
-          let config: AxiosRequestConfig = {
-            baseURL: "http://localhost:3000",
-            responseType: "json",
-            headers: {
-              Accept: "application/json",
-              "Content-Type":
-                "application/json;application/x-www-form-urlencoded",
-              Authorization: "Bearer token",
-            },
+          const data = {
+            companyName,
+            cnae,
+            entityType,
+            cnpj,
+            cep,
+            district,
+            email,
+            street,
+            streetNumber,
+            city,
+            phone,
           };
 
           try {
-            const response = await axios.post(url, data, config);
+            await updateSupplier({ variables: { data, id } });
 
-            if (response.status == 200) {
-              const formData = new FormData();
-              const blob = await (await fetch(profileImage)).blob();
-              const filename = `profile-${id}.${blob.type.split("/")[1]}`;
-              const image = new File([blob], filename, {
-                lastModified: new Date().getTime(),
-                type: blob.type,
-              });
+            const formData = new FormData();
+            const blob = await (await fetch(profileImage)).blob();
+            const filename = `profile-${id}.${blob.type.split("/")[1]}`;
+            const image = new File([blob], filename, {
+              lastModified: new Date().getTime(),
+              type: blob.type,
+            });
 
-              url = "/upload/profile";
-              formData.append("supplierId", String(id));
-              formData.append("profile", image);
-              config = {
-                baseURL: "http://localhost:3000",
-                headers: {
-                  Accept: "application/json",
-                  "Content-Type": "multipart/form-data",
-                  Authorization: "Bearer token",
-                },
-              };
+            const url = "/upload/profile";
+            formData.append("supplierId", String(id));
+            formData.append("profile", image);
+            const config = {
+              baseURL: "http://localhost:3000",
+              headers: {
+                Accept: "application/json",
+                "Content-Type": "multipart/form-data",
+                Authorization: "Bearer token",
+              },
+            };
 
-              const responseUpload = await axios.post(url, formData, config);
-            }
+            const responseUpload = await axios.post(url, formData, config);
           } catch (err) {
             console.log(err);
           }

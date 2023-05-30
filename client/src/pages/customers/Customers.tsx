@@ -6,6 +6,7 @@ import useGraphQL from "@/hooks/useGraphQL";
 import { customers as customersQuery } from "@/graphQL/index";
 import { useCallback, useEffect, useMemo } from "react";
 import AddUserIcon from "@/assets/AddUserIcon.svg";
+import { useQuery } from "@apollo/client";
 
 type CustomersQueryResponse = {
   customers: [
@@ -65,42 +66,38 @@ const StyleButton = styled.div`
 
 function Customers() {
   const {
-    data: customersResponse,
+    loading,
     error,
-    doRequest: doCustomersRequest,
-  } = useGraphQL<CustomersQueryResponse>({
-    query: customersQuery(["id", "companyName", "cnpj"]),
-    baseUrl: "http://127.0.0.1:3000/",
-    headers: { "Content-Type": "application/json" },
-  });
-  useMemo(() => {
-    doCustomersRequest();
-  }, []);
+    data: response,
+  } = useQuery(customersQuery(["id", "companyName", "cnpj"]));
 
   const navigate = useNavigate();
 
   const datasets = useCallback(() => {
-    const customers = customersResponse?.customers || [];
     const labels = ["id", "Nome", "CNPJ"];
     const data = new Map();
 
-    data.set(
-      0,
-      customers.map((c) => c.id || "")
-    );
-    data.set(
-      1,
-      customers.map((c) => c.companyName || "")
-    );
-    data.set(
-      2,
-      customers.map((c) => c.cnpj || "")
-    );
+    const customersId =
+      response?.customers && response?.customers?.length > 0
+        ? response?.customers?.map((c: any) => c.id || "")
+        : [];
+    const customersCompanyName =
+      response?.customers && response?.customers?.length > 0
+        ? response?.customers?.map((c: any) => c.companyName || "")
+        : [];
+    const customersCnpj =
+      response?.customers && response?.customers?.length > 0
+        ? response?.customers?.map((c: any) => c.cnpj || "")
+        : [];
+
+    data.set(0, customersId);
+    data.set(1, customersCompanyName);
+    data.set(2, customersCnpj);
 
     return labels.map((l, i) => {
       return { label: l, hidden: l === "id", data: data.get(i) };
     });
-  }, [customersResponse]);
+  }, [response]);
 
   const customersTableClickCallBack = (value: string) => {
     navigate("/customers/update/" + value);

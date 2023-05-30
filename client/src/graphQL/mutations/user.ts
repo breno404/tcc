@@ -1,33 +1,23 @@
-export const createUser: UserFunction = (fields, variables) => {
-  let data: string[] = Object.entries(Object(variables)).map(
-    (e) => `${e[0]}:${e[1]}`
-  );
-  return `
-    mutation CreateUser {
-      createUser(data: {${data.join(",\n")}) {
+import { gql } from "@apollo/client";
+
+export const createUser = (fields: UserAttribute[]) => gql`
+    mutation CreateUser(data: UserInput!) {
+      createUser(data: $data) {
         ${fields.join("\n")}
       }
     }
   `;
-};
 
-export const updateUser: UserFunction = (fields, variables) => {
-  const id = variables?.id;
-  delete variables?.id;
-  let data: string[] = Object.entries(Object(variables)).map(
-    (e) => `${e[0]}:${e[1]}`
-  );
-  return `
-    mutation UpdateUser {
-      updateUser(data: {${data.join(",\n")}, id: ${id}) {
+export const updateUser = (fields: UserAttribute[]) => gql`
+    mutation UpdateUser(data: UserInput!) {
+      updateUser(data: $data) {
         ${fields.join("\n")}
       }
     }
   `;
-};
 
-export const deleteUser: UserFunction = (fields, variables) => `
-mutation DeleteUser {
-  deleteUser(id: ${variables?.id})
-}
+export const deleteUser = (fields: UserAttribute[]) => gql`
+  mutation DeleteUser($id: String!) {
+    deleteUser(id: $id)
+  }
 `;

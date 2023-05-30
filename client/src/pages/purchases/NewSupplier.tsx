@@ -13,10 +13,9 @@ import PhoneInput from "@/components/inputs/PhoneInput";
 import TextInput from "@/components/inputs/TextInput";
 import validate from "@/helpers/validate";
 import useGraphQL from "@/hooks/useGraphQL";
-import { createSupplier as supplierMutation } from "@/graphQL/index";
+import { createSupplier as createSupplierMutation } from "@/graphQL/index";
 import { useParams } from "react-router-dom";
 import axios, { AxiosRequestConfig } from "axios";
-import { useMutation } from "@apollo/client";
 
 const Style = styled.div`
   display: flex;
@@ -199,10 +198,6 @@ function NewSupplier(): JSX.Element {
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
 
-  const [createSupplier, { loading, error }] = useMutation(
-    supplierMutation(["id", "companyName", "cnpj"])
-  );
-
   const handleChangeProfileCallBack = useCallback(
     (photo: File | null) => {
       if (photo) {
@@ -306,47 +301,80 @@ function NewSupplier(): JSX.Element {
 
       if (valid) {
         (async () => {
-          const data = {
-            companyName,
-            cnae,
-            entityType,
-            cnpj,
-            cep,
-            district,
-            email,
-            street,
-            streetNumber,
-            city,
-            phone,
+          let url = "/graphql";
+          const mutation = createSupplierMutation(
+            [
+              "id",
+              "companyName",
+              "fantasyName",
+              "cnae",
+              "entityType",
+              "cnpj",
+              "cep",
+              "district",
+              "street",
+              "streetNumber",
+              "city",
+              "phone",
+              "email",
+            ],
+            {
+              companyName,
+              fantasyName,
+              cnae,
+              entityType,
+              cnpj,
+              cep,
+              district,
+              street,
+              streetNumber,
+              city,
+              phone,
+              email,
+            }
+          );
+          let data = { query: mutation };
+          let config: AxiosRequestConfig = {
+            baseURL: "http://localhost:3000",
+            responseType: "json",
+            headers: {
+              Accept: "application/json",
+              "Content-Type":
+                "application/json;application/x-www-form-urlencoded",
+              Authorization: "Bearer token",
+            },
           };
 
           try {
-            const response = await createSupplier({ variables: { data } });
+            const response = await axios.post(url, data, config);
+            console.log(response);
+            if (response.status == 200) {
+              const supplierId = response.data.supplier.id;
 
-            const supplierId = response.data.supplier.id;
+              const formData = new FormData();
+              const blob = await (await fetch(profileImage)).blob();
+              const filename = `profile-${supplierId}.${
+                blob.type.split("/")[1]
+              }`;
+              const image = new File([blob], filename, {
+                lastModified: new Date().getTime(),
+                type: blob.type,
+              });
 
-            const formData = new FormData();
-            const blob = await (await fetch(profileImage)).blob();
-            const filename = `profile-${supplierId}.${blob.type.split("/")[1]}`;
-            const image = new File([blob], filename, {
-              lastModified: new Date().getTime(),
-              type: blob.type,
-            });
+              url = "/upload/profile";
+              formData.append("supplierId", String(supplierId));
+              formData.append("profile", image);
+              config = {
+                baseURL: "http://localhost:3000",
+                headers: {
+                  Accept: "application/json",
+                  "Content-Type": "multipart/form-data",
+                  Authorization: "Bearer token",
+                },
+              };
 
-            const url = "/upload/profile";
-            formData.append("supplierId", String(supplierId));
-            formData.append("profile", image);
-            const config = {
-              baseURL: "http://localhost:3000",
-              headers: {
-                Accept: "application/json",
-                "Content-Type": "multipart/form-data",
-                Authorization: "Bearer token",
-              },
-            };
-
-            const responseUpload = await axios.post(url, formData, config);
-            
+              const responseUpload = await axios.post(url, formData, config);
+            }
           } catch (err) {
             console.log(err);
           }

@@ -336,9 +336,7 @@ function NewCustomer(): JSX.Element {
           let data = { query: mutation };
           let config: AxiosRequestConfig = {
             baseURL: "http://localhost:3000",
-            responseType: "json",
             headers: {
-              Accept: "application/json",
               "Content-Type":
                 "application/json;application/x-www-form-urlencoded",
               Authorization: "Bearer token",

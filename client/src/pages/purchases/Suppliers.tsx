@@ -6,7 +6,6 @@ import useGraphQL from "@/hooks/useGraphQL";
 import { suppliers as suppliersQuery } from "@/graphQL/index";
 import { useCallback, useEffect, useMemo } from "react";
 import AddUserIcon from "@/assets/AddUserIcon.svg";
-import { useQuery } from "@apollo/client";
 
 type SuppliersQueryResponse = {
   suppliers: [
@@ -66,36 +65,42 @@ const StyleButton = styled.div`
 
 function Suppliers() {
   const {
-    loading,
+    data: suppliersResponse,
     error,
-    data: response,
-  } = useQuery(suppliersQuery(["id", "companyName", "cnpj"]));
+    doRequest: doSuppliersRequest,
+  } = useGraphQL<SuppliersQueryResponse>({
+    query: suppliersQuery(["id", "companyName", "cnpj"]),
+    baseUrl: "http://127.0.0.1:3000/",
+    headers: { "Content-Type": "application/json" },
+  });
+  useMemo(() => {
+    doSuppliersRequest();
+  }, []);
+
   const navigate = useNavigate();
 
   const datasets = useCallback(() => {
+    const suppliers = suppliersResponse?.suppliers || [];
     const labels = ["id", "Nome", "CNPJ"];
     const data = new Map();
-    const suppliersId =
-      response?.suppliers && response?.suppliers?.length > 0
-        ? response?.suppliers?.map((s: any) => s.id || "")
-        : [];
-    const suppliersCompanyName =
-      response?.suppliers && response?.suppliers?.length > 0
-        ? response?.suppliers?.map((s: any) => s.companyName || "")
-        : [];
-    const suppliersCnpj =
-      response?.suppliers && response?.suppliers?.length > 0
-        ? response?.suppliers?.map((s: any) => s.cnpj || "")
-        : [];
 
-    data.set(0, suppliersId);
-    data.set(1, suppliersCompanyName);
-    data.set(2, suppliersCnpj);
+    data.set(
+      0,
+      suppliers.map((c) => c.id || "")
+    );
+    data.set(
+      1,
+      suppliers.map((c) => c.companyName || "")
+    );
+    data.set(
+      2,
+      suppliers.map((c) => c.cnpj || "")
+    );
 
     return labels.map((l, i) => {
       return { label: l, hidden: l === "id", data: data.get(i) };
     });
-  }, [response]);
+  }, [suppliersResponse]);
 
   const suppliersTableClickCallBack = (value: string) => {
     navigate("/suppliers/update/" + value);

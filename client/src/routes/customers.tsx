@@ -31,7 +31,7 @@ export const updateCustomer: RouteObject = {
         routes: [
           { name: "Home", href: "/" },
           { name: "Clientes", href: "/customers" },
-          { name: "Atualizar", href: "/users/update" },
+          { name: "Atualizar", href: "/customers/update" },
         ],
       },
     };

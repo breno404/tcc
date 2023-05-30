@@ -1,3 +1,4 @@
+
 import axios from "axios";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
@@ -15,7 +16,6 @@ function useGraphQL<T>(options: Options) {
   const [isLoading, setIsLoading] = useState(false);
 
   const doRequest = useCallback(() => {
-    console.log(options.query);
     setIsLoading(true);
     axios
       .post(

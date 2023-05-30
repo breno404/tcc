@@ -143,15 +143,14 @@ function AdminPanel(): JSX.Element | null {
               "Parece que sua licença de usuários está chegando ao limite, caso deseje atualizar seu plano acesse: http://www.example.com.br",
           },
           {
-            title: "Módulos ativos: 7/7",
+            title: "Módulos ativos: 6/6",
             items: [
+              "Usuários",
+              "Estoque",
+              "Compras",
+              "Vendas",
               "Clientes",
               "Fornecedores",
-              "Logística",
-              "Dashboards",
-              "Vendas",
-              "Estoque",
-              "Agenda",
             ],
           },
           {
@@ -165,17 +164,17 @@ function AdminPanel(): JSX.Element | null {
               "[13/05/2023 15:40]: Permissão negada, 'juliana.moura' não possui acesso ao módulo 'Estoque'",
             ],
           },
-          {
-            title: "-------- ------: 0",
-            items: [
-              "Financeiro",
-              "Contas a pagar",
-              "Contas a receber",
-              "Administrativo",
-              "Fiscal",
-              "Logística",
-            ],
-          },
+          // {
+          //   title: "Módulos: 6",
+          //   items: [
+          //     "Usuários",
+          //     "Estoque",
+          //     "Compras",
+          //     "Vendas",
+          //     "Clientes",
+          //     "Fornecedores",
+          //   ],
+          // },
         ]}
       />
     </Style>

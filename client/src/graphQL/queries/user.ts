@@ -1,3 +1,5 @@
+import { gql } from "@apollo/client";
+
 export const users: UserFunction = (fields) => `
 query Users {
   users {
@@ -7,16 +9,16 @@ query Users {
 `;
 
 export const userById: UserFunction = (fields, variables) => `
-query UserById {
-  user:userById(id: "${variables?.id}") {
+query UserById($) {
+  user:userById(id: $id) {
     ${fields.join("\n")}
   }
 }
 `;
 
-export const userByEmail: UserFunction = (fields, variables) => `
-query UserByEmail {
-  user:userByEmail(email: "${variables?.email}") {
+export const userByEmail = (fields: UserAttribute[]) => gql`
+query UserByEmail($email: String!) {
+  user:userByEmail(email: $email) {
     ${fields.join("\n")}
   }
 }

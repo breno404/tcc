@@ -1,45 +1,54 @@
 import Admin from "@/pages/admin/Admin";
+
 import Tracking from "@/pages/logistics/Tracking";
 import Logistics from "@/pages/logistics/Logistics";
 import LayoutLogistics from "@/pages/layouts/LayoutLogistics";
-import Signup from "@/pages/Signup";
-import LayoutUsers from "@/pages/layouts/LayoutUsers";
+
+import Users from "@/pages/users/Users";
 import NewUser from "@/pages/users/NewUser";
 import UpdateUser from "@/pages/users/UpdateUser";
-import Users from "@/pages/users/Users";
-import NewSupplier from "@/pages/suppliers/NewSupplier";
-import UpdateSupplier from "@/pages/suppliers/UpdateSupplier";
-import Suppliers from "@/pages/suppliers/Suppliers";
+import LayoutUsers from "@/pages/layouts/LayoutUsers";
+
+import Customers from "@/pages/customers/Customers";
 import NewCustomer from "@/pages/customers/NewCustomer";
 import UpdateCustomer from "@/pages/customers/UpdateCustomer";
-import Customers from "@/pages/customers/Customers";
-import Details from "@/pages/Details";
-import NotFound from "@/pages/NotFound";
-import Login from "@/pages/Login";
-import Layout from "@/pages/layouts/Layout";
 import LayoutCustomers from "@/pages/layouts/LayoutCustomers";
+
+import NotFound from "@/pages/NotFound";
+import Signup from "@/pages/Signup";
+import Login from "@/pages/Login";
 import Home from "@/pages/Home";
+import Inventory from "@/pages/Inventory";
+import Details from "@/pages/Details";
+import Layout from "@/pages/layouts/Layout";
+
+import Suppliers from "@/pages/suppliers/Suppliers";
+import NewSupplier from "@/pages/suppliers/NewSupplier";
+import UpdateSupplier from "@/pages/suppliers/UpdateSupplier";
+import LayoutSuppliers from "@/pages/layouts/LayoutSuppliers";
 
 export {
-  Details,
-  NotFound,
-  Login,
-  Layout,
-  Home,
   Admin,
   Tracking,
   Logistics,
   LayoutLogistics,
-  Signup,
-  LayoutUsers,
+  Users,
   NewUser,
   UpdateUser,
-  Users,
-  NewSupplier,
-  UpdateSupplier,
-  Suppliers,
-  LayoutCustomers,
+  LayoutUsers,
+  Customers,
   NewCustomer,
   UpdateCustomer,
-  Customers,
+  LayoutCustomers,
+  Details,
+  NotFound,
+  Signup,
+  Login,
+  Home,
+  Inventory,
+  Layout,
+  Suppliers,
+  NewSupplier,
+  UpdateSupplier,
+  LayoutSuppliers,
 };
