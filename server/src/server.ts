@@ -10,13 +10,19 @@ import dataBase from "./database/init";
 import uploadRouter from "./routers/upload.router";
 import multer from "multer";
 import { SupplierResolver } from "./resolvers/supplier.resolver";
+import { ProductResolver } from "./resolvers/product.resolver";
 //import config from "@/config/config";
 
 export default async function init() {
   dataBase.init();
 
   const schema = await buildSchema({
-    resolvers: [UserResolver, CustomerResolver, SupplierResolver],
+    resolvers: [
+      UserResolver,
+      CustomerResolver,
+      SupplierResolver,
+      ProductResolver,
+    ],
   });
 
   const app = express();

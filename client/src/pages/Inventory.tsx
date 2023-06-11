@@ -2,7 +2,7 @@ import Breadcrumb from "@/components/Breadcrumb";
 import styled from "styled-components";
 import {
   ChangeEvent,
-  MouseEventHandler,
+  MouseEvent,
   useCallback,
   useEffect,
   useMemo,
@@ -10,7 +10,7 @@ import {
 } from "react";
 import TextInput from "@/components/inputs/TextInput";
 import validate from "@/helpers/validate";
-import useGraphQL from "@/hooks/useGraphQL";
+import { useQuery } from "@apollo/client";
 import {
   products as productsQuery,
   createProduct as createProductMutation,
@@ -123,7 +123,7 @@ const StyledButton = styled.button<{
 type ButtonProps = {
   backgroundColor: "default" | "transparent";
   label: string;
-  onClick: MouseEventHandler<HTMLButtonElement>;
+  onClick: any;
 };
 
 const Button = ({ backgroundColor, label, onClick }: ButtonProps) => {
@@ -157,7 +157,20 @@ function Inventory(): JSX.Element {
   const [quantity, setQuantity] = useState<number>(0);
   const [price, setPrice] = useState<number>(0.0);
   const [category, setCategory] = useState("");
-  const [products, setProducts] = useState<any[]>([]);
+  const {
+    loading,
+    error,
+    data: response,
+  } = useQuery(
+    productsQuery([
+      "id",
+      "name",
+      "description",
+      "quantity",
+      "price",
+      "category",
+    ])
+  );
 
   const totalValue = price * quantity;
 
@@ -181,6 +194,7 @@ function Inventory(): JSX.Element {
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
     event.preventDefault();
+    setId("");
     setName("");
     setDescription("");
     setQuantity(0);
@@ -193,56 +207,56 @@ function Inventory(): JSX.Element {
       event.preventDefault();
       let valid = true;
 
-      let validName = validate.exists(name);
-      let validDescription = validate.exists(description);
-      let validQuantity = validate.exists(String(quantity));
-      let validPrice = validate.exists(String(price));
-      let validCategory = validate.exists(category);
+      // let validName = validate.exists(name);
+      // let validDescription = validate.exists(description);
+      // let validQuantity = validate.exists(String(quantity));
+      // let validPrice = validate.exists(String(price));
+      // let validCategory = validate.exists(category);
 
-      if (
-        !validName ||
-        !validDescription ||
-        !validQuantity ||
-        !validPrice ||
-        !validCategory
-      ) {
-        valid = false;
-      }
+      // if (
+      //   !validName ||
+      //   !validDescription ||
+      //   !validQuantity ||
+      //   !validPrice ||
+      //   !validCategory
+      // ) {
+      //   valid = false;
+      // }
 
-      if (valid) {
-        (async () => {
-          let url = "/graphql";
-          const mutation = createProductMutation(
-            ["id", "name", "description", "quantity", "price", "category"],
-            {
-              name,
-              description,
-              quantity: String(quantity),
-              price: String(price),
-              category,
-            }
-          );
-          let data = { query: mutation };
-          let config: AxiosRequestConfig = {
-            baseURL: "http://localhost:3000",
-            responseType: "json",
-            headers: {
-              Accept: "application/json",
-              "Content-Type":
-                "application/json;application/x-www-form-urlencoded",
-              Authorization: "Bearer token",
-            },
-          };
+      // if (valid) {
+      //   (async () => {
+      //     let url = "/graphql";
+      //     const mutation = createProductMutation(
+      //       ["id", "name", "description", "quantity", "price", "category"],
+      //       {
+      //         name,
+      //         description,
+      //         quantity: String(quantity),
+      //         price: String(price),
+      //         category,
+      //       }
+      //     );
+      //     let data = { query: mutation };
+      //     let config: AxiosRequestConfig = {
+      //       baseURL: "http://localhost:3000",
+      //       responseType: "json",
+      //       headers: {
+      //         Accept: "application/json",
+      //         "Content-Type":
+      //           "application/json;application/x-www-form-urlencoded",
+      //         Authorization: "Bearer token",
+      //       },
+      //     };
 
-          try {
-            const response = await axios.post(url, data, config);
-          } catch (err) {
-            console.log(err);
-          }
-        })();
-      } else {
-        console.log("Corrija alguns campos antes de enviar a requisição.");
-      }
+      //     try {
+      //       const response = await axios.post(url, data, config);
+      //     } catch (err) {
+      //       console.log(err);
+      //     }
+      //   })();
+      // } else {
+      //   console.log("Corrija alguns campos antes de enviar a requisição.");
+      // }
     },
     [id, name, description, quantity, price, category]
   );
@@ -252,70 +266,88 @@ function Inventory(): JSX.Element {
       event.preventDefault();
       let valid = true;
 
-      let validName = validate.exists(name);
-      let validDescription = validate.exists(description);
-      let validQuantity = validate.exists(String(quantity));
-      let validPrice = validate.exists(String(price));
-      let validCategory = validate.exists(category);
+      // let validName = validate.exists(name);
+      // let validDescription = validate.exists(description);
+      // let validQuantity = validate.exists(String(quantity));
+      // let validPrice = validate.exists(String(price));
+      // let validCategory = validate.exists(category);
 
-      if (
-        !validName ||
-        !validDescription ||
-        !validQuantity ||
-        !validPrice ||
-        !validCategory
-      ) {
-        valid = false;
-      }
+      // if (
+      //   !validName ||
+      //   !validDescription ||
+      //   !validQuantity ||
+      //   !validPrice ||
+      //   !validCategory
+      // ) {
+      //   valid = false;
+      // }
 
-      if (valid) {
-        (async () => {
-          let url = "/graphql";
-          const mutation = updateProductMutation(
-            ["id", "name", "description", "quantity", "price", "category"],
-            {
-              id: String(id),
-              name,
-              description,
-              quantity: String(quantity),
-              price: String(price),
-              category,
-            }
-          );
-          let data = { query: mutation };
-          let config: AxiosRequestConfig = {
-            baseURL: "http://localhost:3000",
-            responseType: "json",
-            headers: {
-              Accept: "application/json",
-              "Content-Type":
-                "application/json;application/x-www-form-urlencoded",
-              Authorization: "Bearer token",
-            },
-          };
+      // if (valid) {
+      //   (async () => {
+      //     let url = "/graphql";
+      //     const mutation = updateProductMutation(
+      //       ["id", "name", "description", "quantity", "price", "category"],
+      //       {
+      //         id: String(id),
+      //         name,
+      //         description,
+      //         quantity: String(quantity),
+      //         price: String(price),
+      //         category,
+      //       }
+      //     );
+      //     let data = { query: mutation };
+      //     let config: AxiosRequestConfig = {
+      //       baseURL: "http://localhost:3000",
+      //       responseType: "json",
+      //       headers: {
+      //         Accept: "application/json",
+      //         "Content-Type":
+      //           "application/json;application/x-www-form-urlencoded",
+      //         Authorization: "Bearer token",
+      //       },
+      //     };
 
-          try {
-            const response = await axios.post(url, data, config);
-          } catch (err) {
-            console.log(err);
-          }
-        })();
-      } else {
-        console.log("Corrija alguns campos antes de enviar a requisição.");
-      }
+      //     try {
+      //       const response = await axios.post(url, data, config);
+      //     } catch (err) {
+      //       console.log(err);
+      //     }
+      //   })();
+      // } else {
+      //   console.log("Corrija alguns campos antes de enviar a requisição.");
+      // }
     },
     [id, name, description, quantity, price, category]
   );
 
-  const productRows = products.map((p, index) => (
-    <tr key={`${p.id}-row-${index}`}>
-      <td>{p.id}</td>
-      <td>{p.name}</td>
-      <td>{p.quantity}</td>
-      <td>{p.price}</td>
-      <td>{p.category}</td>
-    </tr>
-  ));
+  const productRows = response?.products.map((p: any, index: number) => {
+    const handleClick = (evt: MouseEvent<HTMLTableRowElement>) => {
+      setId(p.id);
+      setName(p.name);
+      setDescription(p.description);
+      setCategory(p.category);
+      setPrice(Number(p.price));
+      setQuantity(Number(p.quantity));
+    };
+
+    return (
+      <tr key={`${p.id}-row-${index}`} onClick={handleClick}>
+        <td>{p.id}</td>
+        <td>{p.name}</td>
+        <td>{p.quantity}</td>
+        <td>
+          {Number(p.price).toLocaleString("pt-br", {
+            style: "currency",
+            currency: "BRL",
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          })}
+        </td>
+        <td>{p.category}</td>
+      </tr>
+    );
+  });
 
   return (
     <>

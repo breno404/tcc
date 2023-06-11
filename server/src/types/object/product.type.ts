@@ -16,6 +16,9 @@ class Product {
 
   @Field(() => String)
   category: string;
+
+  @Field(() => String)
+  quantity: number;
 }
 
 export { Product };

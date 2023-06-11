@@ -6,3 +6,7 @@ export * from "@/graphQL/queries/supplier";
 export * from "@/graphQL/mutations/supplier";
 export * from "@/graphQL/queries/product";
 export * from "@/graphQL/mutations/product";
+export * from "@/graphQL/queries/purchase";
+export * from "@/graphQL/mutations/purchase";
+export * from "@/graphQL/queries/sale";
+export * from "@/graphQL/mutations/sale";

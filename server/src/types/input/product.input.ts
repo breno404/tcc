@@ -13,6 +13,9 @@ class ProductInput {
 
   @Field()
   category: string;
+
+  @Field()
+  quantity: number;
 }
 
 export { ProductInput };

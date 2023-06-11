@@ -1,6 +1,7 @@
 import { Model, ModelAttributes, Optional, DataTypes } from "sequelize";
 import { v4 as uuidv4 } from "uuid";
 import { sequelize } from "../database/config";
+import Inventory from "./inventory.model";
 
 interface ProductAttributes {
   id: string;
@@ -18,6 +19,7 @@ class Product extends Model<ProductAttributes> implements ProductAttributes {
   description: string;
   price: number;
   category: string;
+  inventory?: Inventory;
 }
 
 const modelAttributes: ModelAttributes<

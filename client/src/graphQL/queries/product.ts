@@ -1,4 +1,6 @@
-export const products: ProductFunction = (fields) => `
+import { gql } from "@apollo/client";
+
+export const products = (fields: ProductAttribute[]) => gql`
 query Products {
   products {
     ${fields.join("\n")}
@@ -6,9 +8,9 @@ query Products {
 }
 `;
 
-export const productById: ProductFunction = (fields, variables) => `
-query ProductById {
-  product:productById(id: "${variables?.id}") {
+export const productById = (fields: ProductAttribute[]) => gql`
+query ProductById($id: String!) {
+  product:productById(id: $id) {
     ${fields.join("\n")}
   }
 }

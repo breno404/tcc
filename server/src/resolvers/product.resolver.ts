@@ -1,65 +1,49 @@
-
 import { Resolver, Query, Arg, Mutation, Field, ID } from "type-graphql";
-import { SupplierInput } from "../types/input/supplier.input";
-import { Supplier as SupplierType } from "../types/object/supplier.type";
-import SupplierService from "../services/supplier.service";
+import { ProductInput } from "../types/input/product.input";
+import { Product as ProductType } from "../types/object/product.type";
+import InventoryService from "../services/inventory.service";
 import LoggerService from "../services/logger.service";
 
-@Resolver(SupplierType)
-class SupplierResolver {
-  @Query(() => SupplierType, { nullable: true })
-  async supplierById(@Arg("id") id: string): Promise<SupplierType | null> {
-    const service = new SupplierService();
-    return service.findSupplierById(id);
+@Resolver(ProductType)
+class ProductResolver {
+  @Query(() => ProductType, { nullable: true })
+  async productById(@Arg("id") id: string): Promise<ProductType | null> {
+    const service = new InventoryService();
+    return service.findProductById(id);
   }
 
-  @Query(() => SupplierType, { nullable: true })
-  async supplierByCnpj(
-    @Arg("cnpj") cnpj: string
-  ): Promise<SupplierType | null> {
-    const service = new SupplierService();
-    return service.findSupplierByCnpj(cnpj);
-  }
+  @Query(() => [ProductType], { nullable: true })
+  async products(): Promise<ProductType[]> {
+    const service = new InventoryService();
 
-  @Query(() => SupplierType, { nullable: true })
-  async supplierByName(
-    @Arg("name") name: string
-  ): Promise<SupplierType | null> {
-    const service = new SupplierService();
-    return service.findSupplierByName(name);
-  }
-
-  @Query(() => [SupplierType], { nullable: true })
-  async suppliers(): Promise<SupplierType[]> {
-    const service = new SupplierService();
-    return service.findAllSuppliers();
+    return service.findAllProducts();
   }
 
   //---------------------------------------------------------------------------
-  @Mutation(() => SupplierType)
-  async createSupplier(
+  @Mutation(() => ProductType)
+  async createproduct(
     @Arg("data", { validate: { forbidUnknownValues: false } })
-    data: SupplierInput
-  ): Promise<SupplierType | null> {
-    const service = new SupplierService();
-    return service.createSupplier(data);
+    data: ProductInput
+  ): Promise<ProductType | null> {
+    const service = new InventoryService();
+    return service.createProduct(data);
   }
 
-  @Mutation(() => SupplierType)
-  async updateSupplier(
+  @Mutation(() => ProductType)
+  async updateproduct(
     @Arg("id") id: string,
     @Arg("data", { validate: { forbidUnknownValues: false } })
-    data: SupplierInput
-  ): Promise<SupplierType | null> {
-    const service = new SupplierService();
-    return service.updateSupplier(id, data);
+    data: ProductInput
+  ): Promise<ProductType | null> {
+    const service = new InventoryService();
+    return service.updateProduct(id, data);
   }
 
-  @Mutation(() => Boolean)
-  async deleteSupplier(@Arg("id") id: string): Promise<boolean> {
-    const service = new SupplierService();
-    return service.deleteSupplier(id);
+  @Mutation(() => Number)
+  async deleteproduct(@Arg("id") id: string): Promise<number> {
+    const service = new InventoryService();
+    return service.deleteProduct(id);
   }
 }
 
-export { SupplierResolver };
+export { ProductResolver };

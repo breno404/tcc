@@ -3,6 +3,7 @@ import { InventoryRepository } from "../repositories/inventory.repository";
 import { Product as ProductType } from "../types/object/product.type";
 import { Inventory as InventoryType } from "../types/object/inventory.type";
 import LoggerService from "./logger.service";
+import { ProductInput } from "../types/input/product.input";
 
 class InventoryService implements ISubject {
   private observers: IObserver[];
@@ -31,19 +32,26 @@ class InventoryService implements ISubject {
   private readonly productRepository = new ProductRepository();
 
   async findProductById(id: string): Promise<ProductType | null> {
-    let product = await this.productRepository.findById(id);
+    let product = await this.productRepository.findByIdWithInventoryAttributes(
+      id
+    );
     if (!product) return null;
-    return product.toJSON();
+
+    return product;
   }
 
   async findAllProducts(): Promise<ProductType[]> {
-    const products = (await this.productRepository.findAll()).map((p) =>
-      p.toJSON()
-    );
+    const products =
+      await this.productRepository.findAllWithInventoryAttributes();
+
+    if (!products) {
+      return [];
+    }
+
     return products;
   }
 
-  async createProduct(attributes): Promise<ProductType | null> {
+  async createProduct(attributes: ProductInput): Promise<ProductType | null> {
     try {
       const product = await this.productRepository.create(attributes);
       if (!product) throw Error(`Something went wrong during product creation`);
@@ -59,14 +67,15 @@ class InventoryService implements ISubject {
     attributes: Partial<ProductType>
   ): Promise<ProductType | null> {
     await this.productRepository.update(id, attributes);
-    const product = await this.productRepository.findById(id);
+    const product =
+      await this.productRepository.findByIdWithInventoryAttributes(id);
     if (!product) return null;
-    return product.toJSON();
+    return product;
   }
 
-  async deleteProduct(id: string): Promise<boolean> {
+  async deleteProduct(id: string): Promise<number> {
     const deletedRows = await this.productRepository.delete(id);
-    return Boolean(deletedRows);
+    return deletedRows;
   }
 
   syncProfileImageById(productId: any, destPath: string) {}

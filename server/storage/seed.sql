@@ -83,3 +83,10 @@ VALUES
         '700',
         'São Paulo'
     );
+
+    INSERT INTO 
+        products(id,name,description,price,category) 
+    VALUES
+        ('1f087ff4-cabc-4b74-98c8-2908bdd5607b',"Licença Windows 10 for Business","Licença do SO Windows versão 10 com ferramentas e suporte específicos para empresas de todos os portes.",200.00,"Software"),
+        ('fd0cf4a7-3d70-4208-a45f-77e2c658d535','Placa de vídeo RTX 3060','Placa gráfica de penúltima geração para computadores Desktop',3000.00,'Hardware'),
+        ('ce9fe12e-b0bc-4e16-9d12-89b1e8ef5e4d','Firewall de aplicação','Firewall next generation para controles de acesso e barragem de conexões maliciosas',50000.00,'Equipamento');

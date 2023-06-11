@@ -14,6 +14,8 @@ import {
   NotFound,
   Signup,
 } from "@/pages/index";
+import Purchase from "@/pages/purchases/Purchase";
+import Sale from "@/pages/sales/Sale";
 
 const home: RouteObject = {
   index: true,
@@ -42,6 +44,36 @@ const inventory: RouteObject = {
   },
 };
 
+const purchases: RouteObject = {
+  element: <Purchase />,
+  path: "purchases",
+  loader: async ({ request, params }) => {
+    return {
+      breadcrumb: {
+        routes: [
+          { name: "Home", href: "/" },
+          { name: "Compra", href: "/purchases" },
+        ],
+      },
+    };
+  },
+};
+
+const sales: RouteObject = {
+  element: <Sale />,
+  path: "sales",
+  loader: async ({ request, params }) => {
+    return {
+      breadcrumb: {
+        routes: [
+          { name: "Home", href: "/" },
+          { name: "Venda", href: "/sales" },
+        ],
+      },
+    };
+  },
+};
+
 const login: RouteObject = { path: "login", element: <Login /> };
 const signup: RouteObject = { path: "signup", element: <Signup /> };
 const notFound: RouteObject = { path: "*", element: <NotFound /> };
@@ -53,6 +85,8 @@ const router = createBrowserRouter([
     children: [
       home,
       inventory,
+      purchases,
+      sales,
       details,
       admin,
       inventory,

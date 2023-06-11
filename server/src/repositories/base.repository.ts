@@ -7,7 +7,7 @@ abstract class BaseRepository<T extends Model> implements IRepository<T> {
     protected readonly model: (new () => T) & NonAbstract<typeof Model>
   ) {}
 
-  async create(entity): Promise<T> {
+  async create(entity): Promise<(T & any) | null> {
     return this.model.create(entity);
   }
 

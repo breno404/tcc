@@ -1,6 +1,8 @@
 import { Model, ModelAttributes, Optional, DataTypes } from "sequelize";
 import { v4 as uuidv4 } from "uuid";
 import { sequelize } from "../database/config";
+import moment from "moment";
+import Product from "./product.model";
 
 interface InventoryAttributes {
   id: string;
@@ -44,6 +46,7 @@ const modelAttributes: ModelAttributes<
   lastModified: {
     type: DataTypes.DATE,
     allowNull: false,
+    defaultValue: moment(new Date()).format("YYYY-MM-DD HH:mm:ss"),
   },
 };
 
