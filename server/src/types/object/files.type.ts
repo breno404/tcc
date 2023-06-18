@@ -2,7 +2,7 @@ import { ObjectType, Field, ID } from "type-graphql";
 
 @ObjectType()
 class File {
-  @Field(() => ID)
+  @Field(() => String)
   id: string;
 
   @Field()

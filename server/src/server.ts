@@ -11,6 +11,8 @@ import uploadRouter from "./routers/upload.router";
 import multer from "multer";
 import { SupplierResolver } from "./resolvers/supplier.resolver";
 import { ProductResolver } from "./resolvers/product.resolver";
+import { PurchaseResolver } from "./resolvers/purchase.resolver";
+import { SaleResolver } from "./resolvers/sale.resolver";
 //import config from "@/config/config";
 
 export default async function init() {
@@ -22,6 +24,8 @@ export default async function init() {
       CustomerResolver,
       SupplierResolver,
       ProductResolver,
+      SaleResolver,
+      PurchaseResolver
     ],
   });
 

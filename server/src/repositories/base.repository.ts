@@ -1,13 +1,15 @@
 import { NonAbstract } from "sequelize-typescript/dist/shared/types";
+import {Attributes,Model} from 'sequelize'
+import {Col,Fn,Literal} from 'sequelize/types/utils'
 import { IRepository } from "../types";
-import { Model } from "sequelize";
+import {  } from "sequelize";
 
 abstract class BaseRepository<T extends Model> implements IRepository<T> {
   constructor(
     protected readonly model: (new () => T) & NonAbstract<typeof Model>
   ) {}
 
-  async create(entity): Promise<(T & any) | null> {
+  async create(entity:Attributes<T>): Promise<(T & any) | null> {
     return this.model.create(entity);
   }
 
@@ -19,7 +21,7 @@ abstract class BaseRepository<T extends Model> implements IRepository<T> {
     return this.model.findAll();
   }
 
-  async update(id: string, entity: Partial<T>): Promise<[number, T[]]> {
+  async update(id: string, entity: { [key in keyof Attributes<T>]?: Fn | Col | Literal | Attributes<T>[key] | undefined; }): Promise<[number, T[]]> {
     return this.model.update(entity, {
       where: { attribute: { ["id"]: id } },
       returning: true,

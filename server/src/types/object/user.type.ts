@@ -3,9 +3,9 @@ import { File } from "./files.type";
 
 @ObjectType()
 class User {
-  @Field(() => ID)
+  @Field(() => String)
   id: string;
-
+  
   @Field(() => String, { nullable: true })
   name: string;
 

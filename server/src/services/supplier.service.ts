@@ -1,6 +1,6 @@
 import { SupplierRepository } from "../repositories/supplier.repository";
 import { Supplier as SupplierType } from "../types/object/supplier.type";
-import LoggerService from "./logger.service";
+import LoggerService from "./logger.service"; import { v4 as uuid } from 'uuid'
 
 class SupplierService implements ISubject {
   private observers: IObserver[];
@@ -53,6 +53,7 @@ class SupplierService implements ISubject {
   }
 
   async createSupplier(attributes): Promise<SupplierType | null> {
+    const id = uuid()
     try {
       const supplier = await this.supplierRepository.create(attributes);
       if (!supplier)
@@ -79,8 +80,8 @@ class SupplierService implements ISubject {
     return Boolean(deletedRows);
   }
 
-  syncProfileImageById(supplierId: any, destPath: string) {}
-  deleteProfileImage(supplierId: any) {}
+  syncProfileImageById(supplierId: any, destPath: string) { }
+  deleteProfileImage(supplierId: any) { }
 }
 
 export default SupplierService;

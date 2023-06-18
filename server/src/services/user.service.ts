@@ -1,6 +1,7 @@
 import { UserRepository } from "../repositories/user.repository";
 import { User as UserType } from "../types/object/user.type";
-import LoggerService from "./logger.service";
+import LoggerService from "./logger.service"; 
+import { v4 as uuid } from 'uuid'
 
 class UserService implements ISubject {
   private observers: IObserver[];
@@ -45,8 +46,9 @@ class UserService implements ISubject {
   }
 
   async createUser(attributes): Promise<UserType | null> {
+    const id = uuid()
     try {
-      const user = await this.userRepository.create(attributes);
+      const user = await this.userRepository.create({ ...attributes, id });
       if (!user) throw Error(`Something went wrong during user creation`);
       return user;
     } catch (err) {
@@ -71,10 +73,10 @@ class UserService implements ISubject {
   }
 
   syncProfileImageById(userId: any, destPath: string) {
-    
+
   }
   deleteProfileImage(userId: any) {
-    
+
   }
 }
 

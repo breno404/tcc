@@ -1,6 +1,8 @@
 import { CustomerRepository } from "../repositories/customer.repository";
 import { Customer as CustomerType } from "../types/object/customer.type";
+import { v4 as uuid } from 'uuid'
 import LoggerService from "./logger.service";
+import { Customer } from "../models";
 
 class CustomerService implements ISubject {
   private observers: IObserver[];
@@ -53,8 +55,9 @@ class CustomerService implements ISubject {
   }
 
   async createCustomer(attributes): Promise<CustomerType | null> {
+    const id = uuid()
     try {
-      const customer = await this.customerRepository.create(attributes);
+      const customer = await this.customerRepository.create({...attributes,id });
       if (!customer)
         throw Error(`Something went wrong during customer creation`);
       return customer;
@@ -79,8 +82,8 @@ class CustomerService implements ISubject {
     return Boolean(deletedRows);
   }
 
-  syncProfileImageById(customerId: any, destPath: string) {}
-  deleteProfileImage(customerId: any) {}
+  syncProfileImageById(customerId: any, destPath: string) { }
+  deleteProfileImage(customerId: any) { }
 }
 
 export default CustomerService;

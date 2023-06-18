@@ -1,18 +1,24 @@
 import { ObjectType, Field, ID } from "type-graphql";
 
 @ObjectType()
-class Inventory {
+class Purchase {
   @Field(() => String)
   id: string;
+
+  @Field(() => String)
+  purchaseDate: string;
 
   @Field(() => String)
   productId: string;
 
   @Field(() => String)
-  quantityId: number;
+  price: number;
 
   @Field(() => String)
-  lastModified: string | Date;
+  quantity: number;
+
+  @Field(() => String)
+  supplierId: string;
 }
 
-export { Inventory };
+export { Purchase };

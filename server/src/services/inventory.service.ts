@@ -3,7 +3,7 @@ import { InventoryRepository } from "../repositories/inventory.repository";
 import { Product as ProductType } from "../types/object/product.type";
 import { Inventory as InventoryType } from "../types/object/inventory.type";
 import LoggerService from "./logger.service";
-import { ProductInput } from "../types/input/product.input";
+import { ProductInput } from "../types/input/product.input"; import { v4 as uuid } from 'uuid'
 
 class InventoryService implements ISubject {
   private observers: IObserver[];
@@ -52,6 +52,7 @@ class InventoryService implements ISubject {
   }
 
   async createProduct(attributes: ProductInput): Promise<ProductType | null> {
+    const id = uuid()
     try {
       const product = await this.productRepository.create(attributes);
       if (!product) throw Error(`Something went wrong during product creation`);
@@ -78,8 +79,8 @@ class InventoryService implements ISubject {
     return deletedRows;
   }
 
-  syncProfileImageById(productId: any, destPath: string) {}
-  deleteProfileImage(productId: any) {}
+  syncProfileImageById(productId: any, destPath: string) { }
+  deleteProfileImage(productId: any) { }
 }
 
 export default InventoryService;

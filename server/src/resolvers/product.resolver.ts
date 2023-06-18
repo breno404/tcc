@@ -21,7 +21,7 @@ class ProductResolver {
 
   //---------------------------------------------------------------------------
   @Mutation(() => ProductType)
-  async createproduct(
+  async createProduct(
     @Arg("data", { validate: { forbidUnknownValues: false } })
     data: ProductInput
   ): Promise<ProductType | null> {
@@ -30,7 +30,7 @@ class ProductResolver {
   }
 
   @Mutation(() => ProductType)
-  async updateproduct(
+  async updateProduct(
     @Arg("id") id: string,
     @Arg("data", { validate: { forbidUnknownValues: false } })
     data: ProductInput
@@ -40,7 +40,7 @@ class ProductResolver {
   }
 
   @Mutation(() => Number)
-  async deleteproduct(@Arg("id") id: string): Promise<number> {
+  async deleteProduct(@Arg("id") id: string): Promise<number> {
     const service = new InventoryService();
     return service.deleteProduct(id);
   }
