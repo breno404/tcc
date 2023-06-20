@@ -1,11 +1,11 @@
-import { ObjectType, Field, ID } from "type-graphql";
+import { ObjectType, Field} from "type-graphql";
 import { File } from "./files.type";
 
 @ObjectType()
 class User {
   @Field(() => String)
   id: string;
-  
+
   @Field(() => String, { nullable: true })
   name: string;
 

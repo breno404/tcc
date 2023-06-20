@@ -1,7 +1,6 @@
 import { Model, ModelAttributes, Optional, DataTypes } from "sequelize";
 import { v4 as uuidv4 } from "uuid";
 import { sequelize } from "../database/config";
-import File from "./file.model";
 
 interface UserAttributes {
   id: string;

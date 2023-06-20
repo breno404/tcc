@@ -1,8 +1,5 @@
 import { SaleRepository } from "../repositories/sale.repository";
-import { InventoryRepository } from "../repositories/inventory.repository";
 import { Sale as SaleType } from "../types/object/sale.type";
-import { Inventory as InventoryType } from "../types/object/inventory.type";
-import LoggerService from "./logger.service";
 import { SaleInput } from "../types/input/sale.input"; import { v4 as uuid } from 'uuid'
 
 class SaleService implements ISubject {
@@ -28,7 +25,6 @@ class SaleService implements ISubject {
     }
   }
 
-  private readonly inventoryRepository = new InventoryRepository();
   private readonly saleRepository = new SaleRepository();
 
   async findSaleById(id: string): Promise<SaleType | null> {

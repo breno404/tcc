@@ -1,7 +1,5 @@
-import { InventoryRepository } from "../repositories/inventory.repository";
+
 import { Purchase as PurchaseType } from "../types/object/purchase.type";
-import { Inventory as InventoryType } from "../types/object/inventory.type";
-import LoggerService from "./logger.service";
 import { PurchaseInput } from "../types/input/purchase.input"
 import { v4 as uuid } from 'uuid'
 import { PurchaseRepository } from "../repositories/purchase.repository";
@@ -29,7 +27,6 @@ class PurchaseService implements ISubject {
     }
   }
 
-  private readonly inventoryRepository = new InventoryRepository();
   private readonly purchaseRepository = new PurchaseRepository();
 
   async findPurchaseById(id: string): Promise<PurchaseType | null> {

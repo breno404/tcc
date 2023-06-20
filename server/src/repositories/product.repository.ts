@@ -1,4 +1,4 @@
-import { Op } from "sequelize";
+
 import Product from "../models/product.model";
 import Inventory from "../models/inventory.model";
 import { Product as ProductType } from "../types/object/product.type";
@@ -45,7 +45,7 @@ class ProductRepository extends BaseRepository<Product> {
     });
 
     if (products && products.length > 0) {
-      return products.map((p: Product, index: number) => {
+      return products.map((p: Product) => {
         let prod: any = p.toJSON();
         if (!p.inventory) {
           prod.quantity = 0;
