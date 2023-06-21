@@ -10,7 +10,7 @@ import {
 } from "react";
 import TextInput from "@/components/inputs/TextInput";
 import validate from "@/helpers/validate";
-import { useQuery } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client";
 import {
   products as productsQuery,
   createProduct as createProductMutation,
@@ -154,8 +154,8 @@ function Inventory(): JSX.Element {
   const [id, setId] = useState("");
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
-  const [quantity, setQuantity] = useState<number>(0);
-  const [price, setPrice] = useState<number>(0.0);
+  const [quantity, setQuantity] = useState("");
+  const [price, setPrice] = useState("");
   const [category, setCategory] = useState("");
   const {
     loading,
@@ -171,20 +171,52 @@ function Inventory(): JSX.Element {
       "category",
     ])
   );
+  const [createMutation, { data: createdProduct, error: createdProductError }] =
+    useMutation(
+      createProductMutation([
+        "id",
+        "name",
+        "category",
+        "description",
+        "price",
+        "quantity",
+      ])
+    );
+  const [updateMutation, { data: updatedProduct, error: updatedProductError }] =
+    useMutation(
+      updateProductMutation([
+        "id",
+        "name",
+        "category",
+        "description",
+        "price",
+        "quantity",
+      ])
+    );
 
-  const totalValue = price * quantity;
+  useEffect(() => {
+    console.log(createdProduct);
+    console.log(updatedProduct);
+  }, [createdProduct, updatedProduct]);
+
+  useEffect(() => {
+    console.log(createdProductError);
+    console.log(updatedProductError);
+  }, [createdProductError, updatedProductError]);
+
+  const totalValue = (
+    Number(quantity) * Number(price.replaceAll(",", "."))
+  ).toLocaleString("pt-br", {
+    currency: "BRL",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
 
   const handleChangeNameCallBack = (value: string) => {
     setName(value);
   };
   const handleChangeDescriptionCallBack = (value: string) => {
     setDescription(value);
-  };
-  const handleChangeQuantityCallBack = (value: string) => {
-    setQuantity(Number(value));
-  };
-  const handleChangePriceCallBack = (value: string) => {
-    setPrice(Number(value));
   };
   const handleChangeCategoryCallBack = (value: string) => {
     setCategory(value);
@@ -197,128 +229,43 @@ function Inventory(): JSX.Element {
     setId("");
     setName("");
     setDescription("");
-    setQuantity(0);
-    setPrice(0.0);
+    setQuantity("");
+    setPrice("");
     setCategory("");
   };
 
-  const handleSubmitCreateData = useCallback(
+  const handleSubmitData = useCallback(
     (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
       event.preventDefault();
       let valid = true;
 
-      // let validName = validate.exists(name);
-      // let validDescription = validate.exists(description);
-      // let validQuantity = validate.exists(String(quantity));
-      // let validPrice = validate.exists(String(price));
-      // let validCategory = validate.exists(category);
+      let validName = validate.exists(name);
+      let validDescription = validate.exists(description);
+      let validPrice = Number(price.replaceAll(",", ".")) > 0;
+      let validQuantity = Number(quantity.replaceAll(",", ".")) > 0;
+      let validCategory = validate.exists(category);
 
-      // if (
-      //   !validName ||
-      //   !validDescription ||
-      //   !validQuantity ||
-      //   !validPrice ||
-      //   !validCategory
-      // ) {
-      //   valid = false;
-      // }
+      if (!validName || !validDescription || !validCategory) {
+        valid = false;
+      }
 
-      // if (valid) {
-      //   (async () => {
-      //     let url = "/graphql";
-      //     const mutation = createProductMutation(
-      //       ["id", "name", "description", "quantity", "price", "category"],
-      //       {
-      //         name,
-      //         description,
-      //         quantity: String(quantity),
-      //         price: String(price),
-      //         category,
-      //       }
-      //     );
-      //     let data = { query: mutation };
-      //     let config: AxiosRequestConfig = {
-      //       baseURL: "http://localhost:3000",
-      //       responseType: "json",
-      //       headers: {
-      //         Accept: "application/json",
-      //         "Content-Type":
-      //           "application/json;application/x-www-form-urlencoded",
-      //         Authorization: "Bearer token",
-      //       },
-      //     };
-
-      //     try {
-      //       const response = await axios.post(url, data, config);
-      //     } catch (err) {
-      //       console.log(err);
-      //     }
-      //   })();
-      // } else {
-      //   console.log("Corrija alguns campos antes de enviar a requisição.");
-      // }
+      if (valid) {
+        if (id) {
+          updateMutation({
+            variables: { id, data: { name, description, category } },
+          });
+        } else {
+          createMutation({
+            variables: {
+              data: { name, price: 0, quantity: 0, description, category },
+            },
+          });
+        }
+      } else {
+        console.log("Corrija alguns campos antes de enviar a requisição.");
+      }
     },
-    [id, name, description, quantity, price, category]
-  );
-
-  const handleSubmitUpdateData = useCallback(
-    (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-      event.preventDefault();
-      let valid = true;
-
-      // let validName = validate.exists(name);
-      // let validDescription = validate.exists(description);
-      // let validQuantity = validate.exists(String(quantity));
-      // let validPrice = validate.exists(String(price));
-      // let validCategory = validate.exists(category);
-
-      // if (
-      //   !validName ||
-      //   !validDescription ||
-      //   !validQuantity ||
-      //   !validPrice ||
-      //   !validCategory
-      // ) {
-      //   valid = false;
-      // }
-
-      // if (valid) {
-      //   (async () => {
-      //     let url = "/graphql";
-      //     const mutation = updateProductMutation(
-      //       ["id", "name", "description", "quantity", "price", "category"],
-      //       {
-      //         id: String(id),
-      //         name,
-      //         description,
-      //         quantity: String(quantity),
-      //         price: String(price),
-      //         category,
-      //       }
-      //     );
-      //     let data = { query: mutation };
-      //     let config: AxiosRequestConfig = {
-      //       baseURL: "http://localhost:3000",
-      //       responseType: "json",
-      //       headers: {
-      //         Accept: "application/json",
-      //         "Content-Type":
-      //           "application/json;application/x-www-form-urlencoded",
-      //         Authorization: "Bearer token",
-      //       },
-      //     };
-
-      //     try {
-      //       const response = await axios.post(url, data, config);
-      //     } catch (err) {
-      //       console.log(err);
-      //     }
-      //   })();
-      // } else {
-      //   console.log("Corrija alguns campos antes de enviar a requisição.");
-      // }
-    },
-    [id, name, description, quantity, price, category]
+    [id, name, description, category]
   );
 
   const productRows = response?.products.map((p: any, index: number) => {
@@ -327,8 +274,8 @@ function Inventory(): JSX.Element {
       setName(p.name);
       setDescription(p.description);
       setCategory(p.category);
-      setPrice(Number(p.price));
-      setQuantity(Number(p.quantity));
+      setPrice(p.price);
+      setQuantity(p.quantity);
     };
 
     return (
@@ -404,7 +351,7 @@ function Inventory(): JSX.Element {
                     htmlFor="quantity"
                     label="Quantidade"
                     value={quantity}
-                    onChangeCallBack={handleChangeQuantityCallBack}
+                    onChangeCallBack={() => {}}
                   />
                   <TextInput
                     id="price"
@@ -412,7 +359,7 @@ function Inventory(): JSX.Element {
                     htmlFor="price"
                     label="Preço"
                     value={price}
-                    onChangeCallBack={handleChangePriceCallBack}
+                    onChangeCallBack={() => {}}
                   />
                 </section>
                 <section>
@@ -440,20 +387,11 @@ function Inventory(): JSX.Element {
               <div
                 style={{ margin: "1rem 0 0 1rem", padding: "0 1rem 1rem 0" }}
               >
-                {!id && (
-                  <Button
-                    label="Salvar"
-                    backgroundColor="default"
-                    onClick={handleSubmitCreateData}
-                  />
-                )}
-                {id && (
-                  <Button
-                    label="Salvar"
-                    backgroundColor="default"
-                    onClick={handleSubmitUpdateData}
-                  />
-                )}
+                <Button
+                  label="Salvar"
+                  backgroundColor="default"
+                  onClick={handleSubmitData}
+                />
               </div>
               <div
                 style={{ margin: "1rem 0 0 1rem", padding: "0 1rem 1rem 0" }}

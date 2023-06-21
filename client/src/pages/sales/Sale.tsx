@@ -13,8 +13,8 @@ import validate from "@/helpers/validate";
 import { useQuery, useMutation } from "@apollo/client";
 import {
   products as productsQuery,
-  suppliers as suppliersQuery,
-  createPurchase as createPurchaseMutation,
+  customers as customersQuery,
+  createSale as createSaleMutation,
 } from "@/graphQL/index";
 import axios, { AxiosRequestConfig } from "axios";
 
@@ -77,6 +77,30 @@ const StyledButton = styled.button<{
     backgroundColor == "default" ? "#fff" : "#000"};
 `;
 
+const StyledSelect = styled.fieldset`
+  flex: 1;
+  margin: 1rem 0 0 1rem;
+  padding: 0 1rem 1rem 0;
+  font-size: 1.4rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  & select {
+    height: 3rem;
+    min-width: 18rem;
+    border: 1px solid #dedede;
+    outline: none;
+    padding: 0 5px;
+    border-radius: 5px;
+  }
+
+  & select:focus {
+    border: 1px solid #4da6ff;
+  }
+`;
+
 type ButtonProps = {
   backgroundColor: "default" | "transparent";
   label: string;
@@ -95,45 +119,45 @@ const Button = ({ backgroundColor, label, onClick }: ButtonProps) => {
   );
 };
 
-type PurchaseMutationResponse = {
-  supplier: {
-    id?: string;
-    companyName?: string;
-    fantasyName?: string;
-    cnae?: string;
-    entityType?: string;
-    cnpj?: string;
-    cep?: string;
-    district?: string;
-    street?: string;
-    streetNumber?: string;
-    city?: string;
-    phone?: string;
-    email?: string;
-  };
-};
-
 function Sale(): JSX.Element {
   //------------------------------------------------------------
-  const { data: products } = useQuery(productsQuery([]));
+  const { data: products } = useQuery(productsQuery(["id", "name"]));
   const [product, setProduct] = useState(0);
-  const [value, setValue] = useState(0);
-  const [quantity, setQuantity] = useState(0);
-  const { data: suppliers } = useQuery(suppliersQuery([]));
-  const [supplier, setSupplier] = useState(0);
+  const [value, setValue] = useState("");
+  const [quantity, setQuantity] = useState("");
+  const { data: customers } = useQuery(customersQuery(["id", "companyName"]));
+  const [customer, setCustomer] = useState(0);
   const [date, setDate] = useState("");
+  const [mutation, { data: createdSale, error: createSaleError }] =
+    useMutation(
+      createSaleMutation([
+        "id",
+        "price",
+        "quantity",
+        "productId",
+        "customerId",
+        "saleDate",
+      ]));
+
+  const totalValue = (
+    Number(quantity) * Number(value.replaceAll(",", "."))
+  ).toLocaleString("pt-br", {
+    currency: "BRL",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
 
   const handleChangeProductCallBack = (value: string) => {
     setProduct(Number(value));
   };
   const handleChangeValueCallBack = (value: string) => {
-    setValue(Number(value));
+    setValue(value);
   };
   const handleChangeQuantityCallBack = (value: string) => {
-    setQuantity(Number(value));
+    setQuantity(value);
   };
-  const handleChangeSupplierCallBack = (value: string) => {
-    setSupplier(Number(value));
+  const handleChangeCustomerCallBack = (value: string) => {
+    setCustomer(Number(value));
   };
   const handleChangeDateCallBack = (value: string) => {
     setDate(value);
@@ -144,9 +168,9 @@ function Sale(): JSX.Element {
   ) => {
     event.preventDefault();
     setProduct(0);
-    setValue(0);
-    setQuantity(0);
-    setSupplier(0);
+    setValue("");
+    setQuantity("");
+    setCustomer(0);
     setDate("");
   };
 
@@ -156,47 +180,36 @@ function Sale(): JSX.Element {
       let valid = true;
 
       let validProduct = product > 0;
-      let validValue = value > 0;
-      let validQuantity = quantity > 0;
-      let validSupplier = supplier > 0;
+      let validValue = Number(value.replaceAll(",", ".")) > 0;
+      let validQuantity = Number(quantity.replaceAll(",", ".")) > 0;
+      let validCustomer = customer > 0;
       let validDate = validate.exists(date);
 
       if (
         !validProduct ||
         !validValue ||
         !validQuantity ||
-        !validSupplier ||
+        !validCustomer ||
         !validDate
       ) {
         valid = false;
       }
 
       if (valid) {
-        (async () => {
-          let url = "/graphql";
-          const mutation = useMutation(
-            createPurchaseMutation([
-              "id",
-              "price",
-              "quantity",
-              "productId",
-              "supplierId",
-              "purchaseDate",
-            ]),
-            {
-              variables: {
-                product,
-                value,
-                quantity,
-                supplier,
-                date,
-              },
-            }
-          );
-        })();
+        mutation({
+          variables: {
+            data: {
+              product,
+              value,
+              quantity,
+              customer,
+              date,
+            },
+          },
+        });
       }
     },
-    [product, value, quantity, supplier, date]
+    [product, value, quantity, customer, date]
   );
 
   return (
@@ -215,50 +228,89 @@ function Sale(): JSX.Element {
                 }}
               >
                 <section>
+                  <StyledSelect>
+                    <label htmlFor="product">
+                      <p>Produto</p>
+                      <select
+                        id="product"
+                        name="product"
+                        value={product}
+                        onChange={(evt: ChangeEvent<HTMLSelectElement>) => {
+                          const value = evt.target.value;
+
+                          handleChangeProductCallBack(value);
+                        }}
+                      >
+                        <option value="0">--</option>
+                        {products &&
+                          products.length > 0 &&
+                          products.map((p: any) => (
+                            <option value={p.id}>{p.name}</option>
+                          ))}
+                      </select>
+                    </label>
+                  </StyledSelect>
+
+                  <StyledSelect>
+                    <label htmlFor="customer">
+                      {" "}
+                      <p>Cliente</p>
+                      <select
+                        id="customer"
+                        name="customer"
+                        value={customer}
+                        onChange={(evt: ChangeEvent<HTMLSelectElement>) => {
+                          const value = evt.target.value;
+
+                          handleChangeCustomerCallBack(value);
+                        }}
+                      >
+                        <option value="0">--</option>
+                        {customers &&
+                          customers.length > 0 &&
+                          customers.map((s: any) => (
+                            <option value={s.id}>{s.name}</option>
+                          ))}
+                      </select>
+                    </label>
+                  </StyledSelect>
+                </section>
+                <section>
                   <TextInput
-                    id="companyName"
-                    name="companyName"
-                    htmlFor="companyName"
-                    label="Razão Social"
-                    value={product}
-                    onChangeCallBack={handleChangeProductCallBack}
+                    id="quantity"
+                    name="quantity"
+                    htmlFor="quantity"
+                    label="Quantidade"
+                    value={quantity}
+                    onChangeCallBack={handleChangeQuantityCallBack}
                   />
                   <TextInput
-                    id="fantasyName"
-                    name="fantasyName"
-                    htmlFor="fantasyName"
-                    label="Nome Fantasia"
+                    id="price"
+                    name="price"
+                    htmlFor="price"
+                    label="Preço"
                     value={value}
                     onChangeCallBack={handleChangeValueCallBack}
                   />
                 </section>
                 <section>
                   <TextInput
-                    id="entityType"
-                    name="entityType"
-                    htmlFor="entityType"
-                    label="Natureza Jurídica"
-                    value={quantity}
-                    onChangeCallBack={handleChangeQuantityCallBack}
-                  />
-                  <TextInput
-                    id="cnae"
-                    name="cnae"
-                    htmlFor="cnae"
-                    label="CNAE"
-                    value={supplier}
-                    onChangeCallBack={handleChangeSupplierCallBack}
-                  />
-                </section>
-                <section>
-                  <TextInput
-                    id="email"
-                    name="email"
-                    htmlFor="email"
-                    type="email"
-                    label="E-mail"
+                    id="saleDate"
+                    name="saleDate"
+                    htmlFor="saleDate"
+                    type="date"
+                    label="Data da compra"
                     value={date}
                     onChangeCallBack={handleChangeDateCallBack}
+                  />
+                  <TextInput
+                    id="totalValue"
+                    name="totalValue"
+                    htmlFor="totalValue"
+                    type="text"
+                    label="Valor total"
+                    value={totalValue}
+                    onChangeCallBack={() => {}}
                   />
                 </section>
               </section>

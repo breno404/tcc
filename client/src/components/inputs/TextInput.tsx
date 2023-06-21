@@ -11,6 +11,7 @@ const Style = styled.fieldset`
   align-items: center;
 
   & input {
+    min-width: 18rem;
     height: 3rem;
     border: 1px solid #dedede;
     outline: none;
@@ -30,7 +31,7 @@ type InputProps = {
   name: string;
   value: string | number;
   label: string;
-  type?: "text" | "email";
+  type?: "text" | "email" | "date";
 };
 
 function TextInput(props: InputProps): JSX.Element {
