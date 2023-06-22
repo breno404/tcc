@@ -16,6 +16,7 @@ import useGraphQL from "@/hooks/useGraphQL";
 import { createCustomer as createCustomerMutation } from "@/graphQL/index";
 import { useParams } from "react-router-dom";
 import axios, { AxiosRequestConfig } from "axios";
+import { useMutation } from "@apollo/client";
 
 const Style = styled.div`
   display: flex;
@@ -197,6 +198,8 @@ function NewCustomer(): JSX.Element {
   const [city, setCity] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
+  const [mutation, { data: createdCustomer, error: createdCustomerError }] =
+    useMutation(createCustomerMutation(["id", "companyName", "cnpj"]));
 
   const handleChangeProfileCallBack = useCallback(
     (photo: File | null) => {
@@ -300,25 +303,9 @@ function NewCustomer(): JSX.Element {
       }
 
       if (valid) {
-        (async () => {
-          let url = "/graphql";
-          const mutation = createCustomerMutation(
-            [
-              "id",
-              "companyName",
-              "fantasyName",
-              "cnae",
-              "entityType",
-              "cnpj",
-              "cep",
-              "district",
-              "street",
-              "streetNumber",
-              "city",
-              "phone",
-              "email",
-            ],
-            {
+        mutation({
+          variables: {
+            data: {
               companyName,
               fantasyName,
               cnae,
@@ -331,52 +318,39 @@ function NewCustomer(): JSX.Element {
               city,
               phone,
               email,
-            }
-          );
-          let data = { query: mutation };
-          let config: AxiosRequestConfig = {
-            baseURL: "http://localhost:3000",
-            headers: {
-              "Content-Type":
-                "application/json;application/x-www-form-urlencoded",
-              Authorization: "Bearer token",
             },
-          };
+          },
+        });
 
-          try {
-            const response = await axios.post(url, data, config);
-            console.log(response);
-            if (response.status == 200) {
-              const customerId = response.data.customer.id;
+        try {
+          (async () => {
+            const formData = new FormData();
+            const blob = await (await fetch(profileImage)).blob();
+            const filename = `profile-${createdCustomer.id}.${
+              blob.type.split("/")[1]
+            }`;
+            const image = new File([blob], filename, {
+              lastModified: new Date().getTime(),
+              type: blob.type,
+            });
 
-              const formData = new FormData();
-              const blob = await (await fetch(profileImage)).blob();
-              const filename = `profile-${customerId}.${
-                blob.type.split("/")[1]
-              }`;
-              const image = new File([blob], filename, {
-                lastModified: new Date().getTime(),
-                type: blob.type,
-              });
+            const url = "/upload/profile";
+            formData.append("customerId", String(createdCustomer.id));
+            formData.append("profile", image);
+            const config = {
+              baseURL: "http://localhost:3000",
+              headers: {
+                Accept: "application/json",
+                "Content-Type": "multipart/form-data",
+                Authorization: "Bearer token",
+              },
+            };
 
-              url = "/upload/profile";
-              formData.append("customerId", String(customerId));
-              formData.append("profile", image);
-              config = {
-                baseURL: "http://localhost:3000",
-                headers: {
-                  Accept: "application/json",
-                  "Content-Type": "multipart/form-data",
-                  Authorization: "Bearer token",
-                },
-              };
-
-              const responseUpload = await axios.post(url, formData, config);
-            }
-          } catch (err) {
-            console.log(err);
-          }
-        })();
+            const responseUpload = await axios.post(url, formData, config);
+          })();
+        } catch (err) {
+          console.log(err);
+        }
       } else {
         console.log("Corrija alguns campos antes de enviar a requisição.");
       }

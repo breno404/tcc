@@ -19,6 +19,7 @@ import {
 } from "@/graphQL/index";
 import { useParams } from "react-router-dom";
 import axios, { AxiosRequestConfig } from "axios";
+import { useMutation, useQuery } from "@apollo/client";
 
 const Style = styled.div`
   display: flex;
@@ -187,37 +188,9 @@ type CustomerQueryResponse = {
 
 function UpdateCustomer(): JSX.Element {
   const { id } = useParams();
-  const {
-    data: customerResponse,
-    error,
-    doRequest: doCustomerRequest,
-  } = useGraphQL<CustomerQueryResponse>({
-    query: customerQuery(
-      [
-        "id",
-        "companyName",
-        "fantasyName",
-        "cnae",
-        "entityType",
-        "cnpj",
-        "cep",
-        "district",
-        "street",
-        "streetNumber",
-        "city",
-        "phone",
-        "email",
-      ],
-      {
-        id: id || "",
-      }
-    ),
-    baseUrl: "http://127.0.0.1:3000/",
-    headers: { "Content-Type": "application/json" },
-  });
 
   useMemo(() => {
-    if (id) doCustomerRequest();
+    if (id) 
   }, [id]);
 
   //------------------------------------------------------------
@@ -234,6 +207,16 @@ function UpdateCustomer(): JSX.Element {
   const [city, setCity] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
+
+  const {data:customer,loading,error:} = useQuery(customerQuery(["cnpj","city","cep","cnae","district","email","entityType","fantasyName","phone","street",'streetNumber']),{variables:{id}})
+  const [mutation, { data: updatedCustomer, error: updatedCustomerError }] =
+    useMutation(
+      updateCustomerMutation([
+        "id",
+        "companyName",
+        "cnpj","city","cep","cnae","district","email","entityType","fantasyName","phone","street",'streetNumber'
+      ])
+    );
 
   useMemo(() => {
     const customer = customerResponse?.customer;
@@ -252,7 +235,7 @@ function UpdateCustomer(): JSX.Element {
       setPhone(customer.phone || "");
       setEmail(customer.email || "");
     }
-  }, [customerResponse]);
+  }, [customer]);
 
   const handleChangeProfileCallBack = useCallback(
     (photo: File | null) => {
@@ -356,25 +339,9 @@ function UpdateCustomer(): JSX.Element {
       }
 
       if (valid) {
-        (async () => {
-          let url = "/graphql";
-          const mutation = updateCustomerMutation(
-            [
-              "id",
-              "companyName",
-              "fantasyName",
-              "cnae",
-              "entityType",
-              "cnpj",
-              "cep",
-              "district",
-              "street",
-              "streetNumber",
-              "city",
-              "phone",
-              "email",
-            ],
-            {
+        mutation({
+          variables: {
+            data: {
               companyName,
               fantasyName,
               cnae,
@@ -387,50 +354,39 @@ function UpdateCustomer(): JSX.Element {
               city,
               phone,
               email,
-            }
-          );
-          let data = { query: mutation };
-          let config: AxiosRequestConfig = {
-            baseURL: "http://localhost:3000",
-            responseType: "json",
-            headers: {
-              Accept: "application/json",
-              "Content-Type":
-                "application/json;application/x-www-form-urlencoded",
-              Authorization: "Bearer token",
             },
-          };
+          },
+        });
 
-          try {
-            const response = await axios.post(url, data, config);
+        try {
+          (async () => {
+            const formData = new FormData();
+            const blob = await (await fetch(profileImage)).blob();
+            const filename = `profile-${updatedCustomer.id}.${
+              blob.type.split("/")[1]
+            }`;
+            const image = new File([blob], filename, {
+              lastModified: new Date().getTime(),
+              type: blob.type,
+            });
 
-            if (response.status == 200) {
-              const formData = new FormData();
-              const blob = await (await fetch(profileImage)).blob();
-              const filename = `profile-${id}.${blob.type.split("/")[1]}`;
-              const image = new File([blob], filename, {
-                lastModified: new Date().getTime(),
-                type: blob.type,
-              });
+            const url = "/upload/profile";
+            formData.append("customerId", String(updatedCustomer.id));
+            formData.append("profile", image);
+            const config = {
+              baseURL: "http://localhost:3000",
+              headers: {
+                Accept: "application/json",
+                "Content-Type": "multipart/form-data",
+                Authorization: "Bearer token",
+              },
+            };
 
-              url = "/upload/profile";
-              formData.append("customerId", String(id));
-              formData.append("profile", image);
-              config = {
-                baseURL: "http://localhost:3000",
-                headers: {
-                  Accept: "application/json",
-                  "Content-Type": "multipart/form-data",
-                  Authorization: "Bearer token",
-                },
-              };
-
-              const responseUpload = await axios.post(url, formData, config);
-            }
-          } catch (err) {
-            console.log(err);
-          }
-        })();
+            const responseUpload = await axios.post(url, formData, config);
+          })();
+        } catch (err) {
+          console.log(err);
+        }
       } else {
         console.log("Corrija alguns campos antes de enviar a requisição.");
       }
