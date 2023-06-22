@@ -10,7 +10,7 @@ abstract class BaseRepository<T extends Model> implements IRepository<T> {
   ) {}
 
   async create(entity:Attributes<T>): Promise<(T & any) | null> {
-    return this.model.create(entity);
+    return (await this.model.create(entity)).toJSON();
   }
 
   async findById(id: string): Promise<T | null> {

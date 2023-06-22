@@ -12,7 +12,6 @@ import {
 import PhoneInput from "@/components/inputs/PhoneInput";
 import TextInput from "@/components/inputs/TextInput";
 import validate from "@/helpers/validate";
-import useGraphQL from "@/hooks/useGraphQL";
 import { createSupplier as supplierMutation } from "@/graphQL/index";
 import { useParams } from "react-router-dom";
 import axios, { AxiosRequestConfig } from "axios";
@@ -181,7 +180,7 @@ function NewSupplier(): JSX.Element {
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
 
-  const [createSupplier, { data: createdSupplier, loading, error }] =
+  const [mutation, { data: createdSupplier, loading, error }] =
     useMutation(supplierMutation(["id", "companyName", "cnpj"]));
 
   const handleChangeProfileCallBack = useCallback(
@@ -286,51 +285,55 @@ function NewSupplier(): JSX.Element {
       }
 
       if (valid) {
-        (async () => {
-          const data = {
-            companyName,
-            cnae,
-            entityType,
-            cnpj,
-            cep,
-            district,
-            email,
-            street,
-            streetNumber,
-            city,
-            phone,
-          };
-
+        mutation({
+          variables: {
+            data: {
+              companyName,
+              fantasyName,
+              cnae,
+              entityType,
+              cnpj,
+              cep,
+              district,
+              street,
+              streetNumber,
+              city,
+              phone,
+              email,
+            },
+          },
+        }).then((createdSupplier) => {
+          alert('Fornecedor salvo com sucesso!')
           try {
-            createSupplier({ variables: { data } });
+            (async () => {
+              const formData = new FormData();
+              const blob = await (await fetch(profileImage)).blob();
+              const filename = `profile-${createdSupplier.data?.id}.${
+                blob.type.split("/")[1]
+              }`;
+              const image = new File([blob], filename, {
+                lastModified: new Date().getTime(),
+                type: blob.type,
+              });
 
-            const formData = new FormData();
-            const blob = await (await fetch(profileImage)).blob();
-            const filename = `profile-${createdSupplier.id}.${
-              blob.type.split("/")[1]
-            }`;
-            const image = new File([blob], filename, {
-              lastModified: new Date().getTime(),
-              type: blob.type,
-            });
+              const url = "/upload/profile/supplier";
+              formData.append("supplierId", String(createdSupplier.data?.id));
+              formData.append("profile", image);
+              const config = {
+                baseURL: "http://localhost:3000",
+                headers: {
+                  Accept: "application/json",
+                  "Content-Type": "multipart/form-data",
+                  Authorization: "Bearer token",
+                },
+              };
 
-            const url = "/upload/profile";
-            formData.append("supplierId", String(createdSupplier.id));
-            formData.append("profile", image);
-            const config = {
-              baseURL: "http://0.0.0.0:3000",
-              headers: {
-                Accept: "application/json",
-                "Content-Type": "multipart/form-data",
-                Authorization: "Bearer token",
-              },
-            };
-
-            const responseUpload = await axios.post(url, formData, config);
+              const responseUpload = await axios.post(url, formData, config);
+            })();
           } catch (err) {
             console.log(err);
           }
-        })();
+        }).catch(()=> {alert('Um erro ocorreu durante a criação do fornecedor, por favor tente mais tarde')})
       } else {
         console.log("Corrija alguns campos antes de enviar a requisição.");
       }

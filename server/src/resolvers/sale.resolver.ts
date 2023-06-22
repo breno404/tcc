@@ -24,6 +24,8 @@ class SaleResolver {
     @Arg("data", { validate: { forbidUnknownValues: false } })
     data: SaleInput
   ): Promise<SaleType | null> {
+
+    console.log(data)
     const service = new SaleService();
     return service.createSale(data);
   }

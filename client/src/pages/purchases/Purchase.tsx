@@ -89,7 +89,7 @@ const StyledSelect = styled.fieldset`
 
   & select {
     height: 3rem;
-    min-width: 18rem;
+    width: 18rem;
     border: 1px solid #dedede;
     outline: none;
     padding: 0 5px;
@@ -121,11 +121,13 @@ const Button = ({ backgroundColor, label, onClick }: ButtonProps) => {
 
 function Purchase(): JSX.Element {
   //------------------------------------------------------------
-  const { data: products } = useQuery(productsQuery(["id", "name"]));
+  const { data: productsResponse } = useQuery(productsQuery(["id", "name"]));
   const [product, setProduct] = useState(0);
   const [value, setValue] = useState("");
   const [quantity, setQuantity] = useState("");
-  const { data: suppliers } = useQuery(suppliersQuery(["id", "companyName"]));
+  const { data: suppliersResponse } = useQuery(
+    suppliersQuery(["id", "companyName"])
+  );
   const [supplier, setSupplier] = useState(0);
   const [date, setDate] = useState("");
   const [mutation, { data: createdPurchase, error: createPurchaseError }] =
@@ -243,9 +245,9 @@ function Purchase(): JSX.Element {
                         }}
                       >
                         <option value="0">--</option>
-                        {products &&
-                          products.length > 0 &&
-                          products.map((p: any) => (
+                        {productsResponse?.products &&
+                          productsResponse?.products.length > 0 &&
+                          productsResponse?.products.map((p: any) => (
                             <option value={p.id}>{p.name}</option>
                           ))}
                       </select>
@@ -267,10 +269,10 @@ function Purchase(): JSX.Element {
                         }}
                       >
                         <option value="0">--</option>
-                        {suppliers &&
-                          suppliers.length > 0 &&
-                          suppliers.map((s: any) => (
-                            <option value={s.id}>{s.name}</option>
+                        {suppliersResponse?.suppliers &&
+                          suppliersResponse?.suppliers.length > 0 &&
+                          suppliersResponse?.suppliers.map((s: any) => (
+                            <option value={s.id}>{s.companyName}</option>
                           ))}
                       </select>
                     </label>

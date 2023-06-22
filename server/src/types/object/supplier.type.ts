@@ -1,4 +1,5 @@
 import { ObjectType, Field } from "type-graphql";
+import { File } from "./files.type";
 
 @ObjectType()
 class Supplier {
@@ -40,6 +41,9 @@ class Supplier {
 
   @Field(() => String, { nullable: true })
   email: string;
+
+  @Field(() => File, { nullable: true })
+  profile?: File;
 }
 
 export { Supplier };

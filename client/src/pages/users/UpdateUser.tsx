@@ -293,7 +293,7 @@ function UpdateUser(): JSX.Element {
                 type: blob.type,
               });
 
-              const url = "/upload/profile";
+              const url = "/upload/profile/user";
               formData.append("userId", String(id));
               formData.append("profile", image);
               const config = {

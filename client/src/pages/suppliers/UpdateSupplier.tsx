@@ -386,7 +386,7 @@ function UpdateSupplier(): JSX.Element {
               type: blob.type,
             });
 
-            const url = "/upload/profile";
+            const url = "/upload/profile/supplier";
             formData.append("supplierId", String(id));
             formData.append("profile", image);
             const config = {

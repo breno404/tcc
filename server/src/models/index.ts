@@ -4,8 +4,25 @@ import Inventory from "./inventory.model";
 import Supplier from "./supplier.model";
 import Customer from "./customer.model";
 import File from "./file.model";
+import Purchase from "./purchase.model";
+import Sale from "./sale.model";
 
 Product.hasOne(Inventory);
+Product.hasMany(Purchase);
+Product.hasMany(Sale);
+
 Inventory.belongsTo(Product);
+Purchase.belongsTo(Product);
+Sale.belongsTo(Product);
+
+Supplier.hasMany(Purchase)
+Purchase.belongsTo(Supplier);
+
+Customer.hasMany(Sale)
+Sale.belongsTo(Customer);
+
+User.belongsToMany(File, { through: 'files_users' });
+File.belongsToMany(User, { through: 'files_users' });
+
 
 export { User, Customer, File, Inventory, Product, Supplier };

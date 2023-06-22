@@ -41,7 +41,8 @@ class CustomerResolver {
     data: CustomerInput
   ): Promise<CustomerType | null> {
     const service = new CustomerService();
-    return service.createCustomer(data);
+    const customer = await service.createCustomer(data);
+    return customer
   }
 
   @Mutation(() => CustomerType)

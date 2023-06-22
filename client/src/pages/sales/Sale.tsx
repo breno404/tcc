@@ -89,7 +89,7 @@ const StyledSelect = styled.fieldset`
 
   & select {
     height: 3rem;
-    min-width: 18rem;
+    width: 18rem;
     border: 1px solid #dedede;
     outline: none;
     padding: 0 5px;
@@ -121,23 +121,25 @@ const Button = ({ backgroundColor, label, onClick }: ButtonProps) => {
 
 function Sale(): JSX.Element {
   //------------------------------------------------------------
-  const { data: products } = useQuery(productsQuery(["id", "name"]));
-  const [product, setProduct] = useState(0);
+  const { data: productsResponse } = useQuery(productsQuery(["id", "name"]));
+  const [product, setProduct] = useState("");
   const [value, setValue] = useState("");
   const [quantity, setQuantity] = useState("");
-  const { data: customers } = useQuery(customersQuery(["id", "companyName"]));
-  const [customer, setCustomer] = useState(0);
+  const { data: customersResponse } = useQuery(
+    customersQuery(["id", "companyName"])
+  );
+  const [customer, setCustomer] = useState("");
   const [date, setDate] = useState("");
-  const [mutation, { data: createdSale, error: createSaleError }] =
-    useMutation(
-      createSaleMutation([
-        "id",
-        "price",
-        "quantity",
-        "productId",
-        "customerId",
-        "saleDate",
-      ]));
+  const [mutation, { data: createdSale, error: createSaleError }] = useMutation(
+    createSaleMutation([
+      "id",
+      "price",
+      "quantity",
+      "productId",
+      "customerId",
+      "saleDate",
+    ])
+  );
 
   const totalValue = (
     Number(quantity) * Number(value.replaceAll(",", "."))
@@ -148,7 +150,7 @@ function Sale(): JSX.Element {
   });
 
   const handleChangeProductCallBack = (value: string) => {
-    setProduct(Number(value));
+    setProduct(value);
   };
   const handleChangeValueCallBack = (value: string) => {
     setValue(value);
@@ -157,7 +159,7 @@ function Sale(): JSX.Element {
     setQuantity(value);
   };
   const handleChangeCustomerCallBack = (value: string) => {
-    setCustomer(Number(value));
+    setCustomer(value);
   };
   const handleChangeDateCallBack = (value: string) => {
     setDate(value);
@@ -167,10 +169,10 @@ function Sale(): JSX.Element {
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
     event.preventDefault();
-    setProduct(0);
+    setProduct("");
     setValue("");
     setQuantity("");
-    setCustomer(0);
+    setCustomer("");
     setDate("");
   };
 
@@ -179,10 +181,10 @@ function Sale(): JSX.Element {
       event.preventDefault();
       let valid = true;
 
-      let validProduct = product > 0;
+      let validProduct = !!product;
       let validValue = Number(value.replaceAll(",", ".")) > 0;
       let validQuantity = Number(quantity.replaceAll(",", ".")) > 0;
-      let validCustomer = customer > 0;
+      let validCustomer = !!customer;
       let validDate = validate.exists(date);
 
       if (
@@ -241,10 +243,10 @@ function Sale(): JSX.Element {
                           handleChangeProductCallBack(value);
                         }}
                       >
-                        <option value="0">--</option>
-                        {products &&
-                          products.length > 0 &&
-                          products.map((p: any) => (
+                        <option value="">--</option>
+                        {productsResponse?.products &&
+                          productsResponse?.products.length > 0 &&
+                          productsResponse?.products.map((p: any) => (
                             <option value={p.id}>{p.name}</option>
                           ))}
                       </select>
@@ -265,11 +267,11 @@ function Sale(): JSX.Element {
                           handleChangeCustomerCallBack(value);
                         }}
                       >
-                        <option value="0">--</option>
-                        {customers &&
-                          customers.length > 0 &&
-                          customers.map((s: any) => (
-                            <option value={s.id}>{s.name}</option>
+                        <option value="">--</option>
+                        {customersResponse?.customers &&
+                          customersResponse?.customers.length > 0 &&
+                          customersResponse?.customers.map((s: any) => (
+                            <option value={s.id}>{s.companyName}</option>
                           ))}
                       </select>
                     </label>

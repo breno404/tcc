@@ -2,10 +2,10 @@ import Breadcrumb from "@/components/Breadcrumb";
 import { useNavigate } from "react-router-dom";
 import Table from "@/components/Table";
 import styled from "styled-components";
-import useGraphQL from "@/hooks/useGraphQL";
 import { users as usersQuery } from "@/graphQL/index";
 import { useCallback, useEffect, useMemo } from "react";
 import AddUserIcon from "@/assets/AddUserIcon.svg";
+import { useQuery } from "@apollo/client";
 
 type UsersQueryResponse = {
   users: [
@@ -68,15 +68,7 @@ function Users() {
   const {
     data: usersResponse,
     error,
-    doRequest: doUsersRequest,
-  } = useGraphQL<UsersQueryResponse>({
-    query: usersQuery(["id", "userName", "name", "email"]),
-    baseUrl: "http://127.0.0.1:3000/",
-    headers: { "Content-Type": "application/json" },
-  });
-  useMemo(() => {
-    doUsersRequest();
-  }, []);
+  } = useQuery(usersQuery(["id", "userName", "name", "email"]));
 
   const navigate = useNavigate();
 
@@ -89,19 +81,19 @@ function Users() {
 
     data.set(
       0,
-      users.map((u) => u.id || "")
+      users.map((u:any) => u.id || "")
     );
     data.set(
       1,
-      users.map((u) => u.userName || "")
+      users.map((u:any) => u.userName || "")
     );
     data.set(
       2,
-      users.map((u) => u.name || "")
+      users.map((u:any) => u.name || "")
     );
     data.set(
       3,
-      users.map((u) => u.email || "")
+      users.map((u:any) => u.email || "")
     );
 
     return labels.map((l, i) => {

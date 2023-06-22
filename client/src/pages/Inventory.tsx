@@ -195,11 +195,6 @@ function Inventory(): JSX.Element {
     );
 
   useEffect(() => {
-    console.log(createdProduct);
-    console.log(updatedProduct);
-  }, [createdProduct, updatedProduct]);
-
-  useEffect(() => {
     console.log(createdProductError);
     console.log(updatedProductError);
   }, [createdProductError, updatedProductError]);

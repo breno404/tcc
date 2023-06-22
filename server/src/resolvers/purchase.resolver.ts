@@ -2,6 +2,7 @@ import { Resolver, Query, Arg, Mutation } from "type-graphql";
 import { PurchaseInput } from "../types/input/purchase.input";
 import { Purchase as PurchaseType } from "../types/object/purchase.type";
 import PurchaseService from "../services/purchase.service";
+import { Inventory } from "../models";
 
 
 @Resolver(PurchaseType)
@@ -26,7 +27,8 @@ class PurchaseResolver {
     data: PurchaseInput
   ): Promise<PurchaseType | null> {
     const service = new PurchaseService();
-    return service.createPurchase(data);
+    const purchase = await service.createPurchase(data);
+    return purchase
   }
 
   @Mutation(() => Number)

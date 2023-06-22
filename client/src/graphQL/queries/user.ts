@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 
-export const users: UserFunction = (fields) => `
+export const users = (fields: UserAttribute[]) => gql`
 query Users {
   users {
     ${fields.join("\n")}

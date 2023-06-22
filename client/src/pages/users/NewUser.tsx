@@ -15,6 +15,7 @@ import PasswordInput from "@/components/inputs/PasswordInput";
 import TextInput from "@/components/inputs/TextInput";
 import validate from "@/helpers/validate";
 import { createUser as createUserMutation } from "@/graphQL/index";
+import { useMutation } from "@apollo/client";
 
 const Style = styled.div`
   display: flex;
@@ -165,6 +166,11 @@ function NewUser(): JSX.Element {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
+  const [mutation, { data: createdUser, error: createdUserError }] =
+    useMutation(
+      createUserMutation(["id", "name", "email", "phone", "userName"])
+    );
+
   const handleChangeProfileCallBack = useCallback(
     (photo: File | null) => {
       if (photo) {
@@ -241,47 +247,34 @@ function NewUser(): JSX.Element {
       }
 
       if (valid) {
-        (async () => {
-          let url = "/graphql";
-          const mutation = createUserMutation(
-            ["id", "userName", "name", "email", "phone"],
-            {
+        mutation({
+          variables: {
+            data: {
               userName,
               name,
               email,
               phone,
-            }
-          );
-          let data = { query: mutation };
-          let config: AxiosRequestConfig = {
-            baseURL: "http://localhost:3000",
-            responseType: "json",
-            headers: {
-              Accept: "application/json",
-              "Content-Type":
-                "application/json;application/x-www-form-urlencoded",
-              Authorization: "Bearer token",
             },
-          };
+          },
+        });
 
+        (async () => {
           try {
-            const response = await axios.post(url, data, config);
-
-            const user = response.data.user;
-
-            if (response.status == 200) {
+            if (createdUser.data) {
               const formData = new FormData();
               const blob = await (await fetch(profileImage)).blob();
-              const filename = `profile-${user.id}.${blob.type.split("/")[1]}`;
+              const filename = `profile-${createdUser.data?.id}.${
+                blob.type.split("/")[1]
+              }`;
               const image = new File([blob], filename, {
                 lastModified: new Date().getTime(),
                 type: blob.type,
               });
 
-              url = "/upload/profile";
-              formData.append("userId", String(user.id));
+              const url = "/upload/profile/user";
+              formData.append("userId", String(createdUser.data?.id));
               formData.append("profile", image);
-              config = {
+              const config = {
                 baseURL: "http://localhost:3000",
                 headers: {
                   Accept: "application/json",
@@ -347,13 +340,12 @@ function NewUser(): JSX.Element {
                 value={email}
                 onChangeCallBack={handleChangeEmailCallBack}
               />
-              <PhoneInput
+              <TextInput
                 id="phone"
                 name="phone"
                 htmlFor="phone"
                 label="Telefone"
                 value={phone}
-                type="tel"
                 onChangeCallBack={handleChangePhoneCallBack}
               />
             </section>

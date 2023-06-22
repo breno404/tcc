@@ -368,7 +368,7 @@ function UpdateCustomer(): JSX.Element {
               type: blob.type,
             });
 
-            const url = "/upload/profile";
+            const url = "/upload/profile/customer";
             formData.append("customerId", String(id));
             formData.append("profile", image);
             const config = {
