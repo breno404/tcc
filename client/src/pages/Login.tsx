@@ -1,5 +1,6 @@
 import React from "react";
 import styled from "styled-components";
+import {useNavigate} from 'react-router-dom'
 
 const Container = styled.div`
   display: flex;
@@ -56,10 +57,11 @@ const Container = styled.div`
 `;
 
 function Login() {
+  const navigate = useNavigate()
   return (
     <Container>
       <div>
-        <form action="" method="post">
+        <form action="" method="post" >
           <div
             style={{
               flexDirection: "column",
@@ -86,7 +88,11 @@ function Login() {
               </fieldset>
             </div>
             <div>
-              <button type="submit">Login</button>
+              <button type="submit" onClick={(evt)=>{
+                evt.preventDefault()
+
+                navigate('/')
+              }}>Login</button>
             </div>
           </div>
         </form>
