@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
 
 export const createUser = (fields: UserAttribute[]) => gql`
-    mutation CreateUser(data: UserInput!) {
+    mutation CreateUser($data: UserInput!) {
       createUser(data: $data) {
         ${fields.join("\n")}
       }
@@ -9,8 +9,8 @@ export const createUser = (fields: UserAttribute[]) => gql`
   `;
 
 export const updateUser = (fields: UserAttribute[]) => gql`
-    mutation UpdateUser(data: UserInput!) {
-      updateUser(data: $data) {
+    mutation UpdateUser($id:String!,$data: UserInput!) {
+      updateUser(data: $data, id: $id) {
         ${fields.join("\n")}
       }
     }

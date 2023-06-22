@@ -8,8 +8,8 @@ query Users {
 }
 `;
 
-export const userById: UserFunction = (fields, variables) => `
-query UserById($) {
+export const userById = (fields: UserAttribute[]) => gql`
+query UserById($id: String!) {
   user:userById(id: $id) {
     ${fields.join("\n")}
   }

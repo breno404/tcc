@@ -12,10 +12,9 @@ import {
 import PhoneInput from "@/components/inputs/PhoneInput";
 import TextInput from "@/components/inputs/TextInput";
 import validate from "@/helpers/validate";
-import useGraphQL from "@/hooks/useGraphQL";
 import {
   customerById as customerQuery,
-  updateCustomer as updateCustomerMutation,
+  updateCustomer as customerMutation,
 } from "@/graphQL/index";
 import { useParams } from "react-router-dom";
 import axios, { AxiosRequestConfig } from "axios";
@@ -168,31 +167,45 @@ const CNPJCEPSection = styled.section`
   }
 `;
 
-type CustomerQueryResponse = {
-  customer: {
-    id?: string;
-    companyName?: string;
-    fantasyName?: string;
-    cnae?: string;
-    entityType?: string;
-    cnpj?: string;
-    cep?: string;
-    district?: string;
-    street?: string;
-    streetNumber?: string;
-    city?: string;
-    phone?: string;
-    email?: string;
-  };
-};
-
 function UpdateCustomer(): JSX.Element {
   const { id } = useParams();
 
-  useMemo(() => {
-    if (id) 
-  }, [id]);
+  const { data: response } = useQuery(
+    customerQuery([
+      "id",
+      "companyName",
+      "fantasyName",
+      "cnae",
+      "entityType",
+      "cnpj",
+      "cep",
+      "district",
+      "street",
+      "streetNumber",
+      "city",
+      "phone",
+      "email",
+    ]),
+    { variables: { id } }
+  );
 
+  const [updateCustomer] = useMutation(
+    customerMutation([
+      "id",
+      "companyName",
+      "fantasyName",
+      "cnae",
+      "entityType",
+      "cnpj",
+      "cep",
+      "district",
+      "street",
+      "streetNumber",
+      "city",
+      "phone",
+      "email",
+    ])
+  );
   //------------------------------------------------------------
   const [profileImage, setProfileImage] = useState("");
   const [companyName, setCompanyName] = useState("");
@@ -208,18 +221,8 @@ function UpdateCustomer(): JSX.Element {
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
 
-  const {data:customer,loading,error:} = useQuery(customerQuery(["cnpj","city","cep","cnae","district","email","entityType","fantasyName","phone","street",'streetNumber']),{variables:{id}})
-  const [mutation, { data: updatedCustomer, error: updatedCustomerError }] =
-    useMutation(
-      updateCustomerMutation([
-        "id",
-        "companyName",
-        "cnpj","city","cep","cnae","district","email","entityType","fantasyName","phone","street",'streetNumber'
-      ])
-    );
-
   useMemo(() => {
-    const customer = customerResponse?.customer;
+    const customer = response?.customer;
 
     if (customer) {
       setCompanyName(customer.companyName || "");
@@ -235,7 +238,7 @@ function UpdateCustomer(): JSX.Element {
       setPhone(customer.phone || "");
       setEmail(customer.email || "");
     }
-  }, [customer]);
+  }, [response]);
 
   const handleChangeProfileCallBack = useCallback(
     (photo: File | null) => {
@@ -339,39 +342,34 @@ function UpdateCustomer(): JSX.Element {
       }
 
       if (valid) {
-        mutation({
-          variables: {
-            data: {
-              companyName,
-              fantasyName,
-              cnae,
-              entityType,
-              cnpj,
-              cep,
-              district,
-              street,
-              streetNumber,
-              city,
-              phone,
-              email,
-            },
-          },
-        });
+        (async () => {
+          const data = {
+            companyName,
+            cnae,
+            entityType,
+            cnpj,
+            cep,
+            district,
+            email,
+            street,
+            streetNumber,
+            city,
+            phone,
+          };
 
-        try {
-          (async () => {
+          try {
+            await updateCustomer({ variables: { data, id } });
+
             const formData = new FormData();
             const blob = await (await fetch(profileImage)).blob();
-            const filename = `profile-${updatedCustomer.id}.${
-              blob.type.split("/")[1]
-            }`;
+            const filename = `profile-${id}.${blob.type.split("/")[1]}`;
             const image = new File([blob], filename, {
               lastModified: new Date().getTime(),
               type: blob.type,
             });
 
             const url = "/upload/profile";
-            formData.append("customerId", String(updatedCustomer.id));
+            formData.append("customerId", String(id));
             formData.append("profile", image);
             const config = {
               baseURL: "http://localhost:3000",
@@ -383,10 +381,10 @@ function UpdateCustomer(): JSX.Element {
             };
 
             const responseUpload = await axios.post(url, formData, config);
-          })();
-        } catch (err) {
-          console.log(err);
-        }
+          } catch (err) {
+            console.log(err);
+          }
+        })();
       } else {
         console.log("Corrija alguns campos antes de enviar a requisição.");
       }

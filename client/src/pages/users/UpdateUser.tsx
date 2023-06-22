@@ -9,17 +9,16 @@ import {
   useMemo,
   useState,
 } from "react";
-import PhoneInput from "@/components/inputs/PhoneInput";
-import PasswordInput from "@/components/inputs/PasswordInput";
 import TextInput from "@/components/inputs/TextInput";
 import validate from "@/helpers/validate";
-import useGraphQL from "@/hooks/useGraphQL";
 import {
   userById as userQuery,
-  updateUser as updateUserMutation,
+  updateUser as userMutation,
 } from "@/graphQL/index";
+import { useQuery, useMutation } from "@apollo/client";
 import { useParams } from "react-router-dom";
 import axios, { AxiosRequestConfig } from "axios";
+import PasswordInput from "@/components/inputs/PasswordInput";
 
 const Style = styled.div`
   display: flex;
@@ -161,40 +160,20 @@ const Profile = (props: ProfileProps) => {
   );
 };
 
-type UserQueryResponse = {
-  user: {
-    id?: string;
-    name?: string;
-    userName?: string;
-    email?: string;
-    phone?: string;
-  };
-};
-
 function UpdateUser(): JSX.Element {
   const { id } = useParams();
-  const {
-    data: userResponse,
-    error,
-    doRequest: doUserRequest,
-  } = useGraphQL<UserQueryResponse>({
-    query: userQuery(["id", "userName", "name", "email", "phone"], {
-      id: id || "",
-    }),
-    baseUrl: "http://127.0.0.1:3000/",
-    headers: { "Content-Type": "application/json" },
-  });
-  console.log(
-    userQuery(["id", "userName", "name", "email", "phone"], {
-      id: id || "",
-    })
+  const { data: response } = useQuery(
+    userQuery(["id", "userName", "name", "email", "phone"]),
+    {
+      variables: {
+        id,
+      },
+    }
   );
-  useMemo(() => {
-    if (id) doUserRequest();
-  }, [id]);
 
-  console.log(error);
-
+  const [mutation, { data: updatedUser,error:updatedUserError }] = useMutation(
+    userMutation(["id", "name", "userName", "phone", "email"])
+  );
   //------------------------------------------------------------
   const [profileImage, setProfileImage] = useState("");
   const [userName, setUserName] = useState("");
@@ -205,7 +184,7 @@ function UpdateUser(): JSX.Element {
   const [confirmPassword, setConfirmPassword] = useState("");
 
   useMemo(() => {
-    const user = userResponse?.user;
+    const user = response?.user;
 
     if (user) {
       setUserName(user.userName || "");
@@ -213,7 +192,7 @@ function UpdateUser(): JSX.Element {
       setEmail(user.email || "");
       setPhone(user.phone || "");
     }
-  }, [userResponse]);
+  }, [response]);
 
   const handleChangeProfileCallBack = useCallback(
     (photo: File | null) => {
@@ -292,32 +271,20 @@ function UpdateUser(): JSX.Element {
 
       if (valid) {
         (async () => {
-          let url = "/graphql";
-          const mutation = updateUserMutation(
-            ["id", "userName", "name", "email", "phone"],
-            {
-              userName,
-              name,
-              email,
-              phone,
-            }
-          );
-          let data = { query: mutation };
-          let config: AxiosRequestConfig = {
-            baseURL: "http://localhost:3000",
-            responseType: "json",
-            headers: {
-              Accept: "application/json",
-              "Content-Type":
-                "application/json;application/x-www-form-urlencoded",
-              Authorization: "Bearer token",
+          mutation({
+            variables: {
+              data: {
+                userName,
+                name,
+                email,
+                phone,
+              },
             },
-          };
+          });
 
           try {
-            const response = await axios.post(url, data, config);
 
-            if (response.status == 200) {
+            if (!updatedUserError) {
               const formData = new FormData();
               const blob = await (await fetch(profileImage)).blob();
               const filename = `profile-${id}.${blob.type.split("/")[1]}`;
@@ -326,11 +293,11 @@ function UpdateUser(): JSX.Element {
                 type: blob.type,
               });
 
-              url = "/upload/profile";
+              const url = "/upload/profile";
               formData.append("userId", String(id));
               formData.append("profile", image);
-              config = {
-                baseURL: "http://localhost:3000",
+              const config = {
+                baseURL: "http://0.0.0.0:3000",
                 headers: {
                   Accept: "application/json",
                   "Content-Type": "multipart/form-data",
@@ -395,13 +362,12 @@ function UpdateUser(): JSX.Element {
                 value={email}
                 onChangeCallBack={handleChangeEmailCallBack}
               />
-              <PhoneInput
+              <TextInput
                 id="phone"
                 name="phone"
                 htmlFor="phone"
                 label="Telefone"
                 value={phone}
-                type="tel"
                 onChangeCallBack={handleChangePhoneCallBack}
               />
             </section>

@@ -9,15 +9,15 @@ export const createSupplier = (fields: SupplierAttribute[]) => gql`
   `;
 
 export const updateSupplier = (fields: SupplierAttribute[]) => gql`
-    mutation UpdateSupplier($data: SupplierInput!) {
-      updateSupplier(data: $data) {
+    mutation UpdateSupplier($id:String!,$data: SupplierInput!) {
+      updateSupplier(data: $data, id: $id) {
         ${fields.join("\n")}
       }
     }
   `;
 
 export const deleteSupplier = (fields: SupplierAttribute[]) => gql`
-mutation DeleteSupplier(id: String!) {
+mutation DeleteSupplier($id: String!) {
   deleteSupplier(id: $id)
 }
 `;

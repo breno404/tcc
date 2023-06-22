@@ -10,7 +10,7 @@ query Customers {
 
 export const customerById = (fields: CustomerAttribute[]) => gql`
 query CustomerById($id: String!) {
-  customer:customerById(id: $id}) {
+  customer:customerById(id: $id) {
     ${fields.join("\n")}
   }
 }

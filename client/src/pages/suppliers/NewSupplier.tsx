@@ -165,24 +165,6 @@ const CNPJCEPSection = styled.section`
   }
 `;
 
-type SupplierQueryResponse = {
-  supplier: {
-    id?: string;
-    companyName?: string;
-    fantasyName?: string;
-    cnae?: string;
-    entityType?: string;
-    cnpj?: string;
-    cep?: string;
-    district?: string;
-    street?: string;
-    streetNumber?: string;
-    city?: string;
-    phone?: string;
-    email?: string;
-  };
-};
-
 function NewSupplier(): JSX.Element {
   //------------------------------------------------------------
   const [profileImage, setProfileImage] = useState("");
@@ -199,9 +181,8 @@ function NewSupplier(): JSX.Element {
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
 
-  const [createSupplier, { loading, error }] = useMutation(
-    supplierMutation(["id", "companyName", "cnpj"])
-  );
+  const [createSupplier, { data: createdSupplier, loading, error }] =
+    useMutation(supplierMutation(["id", "companyName", "cnpj"]));
 
   const handleChangeProfileCallBack = useCallback(
     (photo: File | null) => {
@@ -321,23 +302,23 @@ function NewSupplier(): JSX.Element {
           };
 
           try {
-            const response = await createSupplier({ variables: { data } });
-
-            const supplierId = response.data.supplier.id;
+            createSupplier({ variables: { data } });
 
             const formData = new FormData();
             const blob = await (await fetch(profileImage)).blob();
-            const filename = `profile-${supplierId}.${blob.type.split("/")[1]}`;
+            const filename = `profile-${createdSupplier.id}.${
+              blob.type.split("/")[1]
+            }`;
             const image = new File([blob], filename, {
               lastModified: new Date().getTime(),
               type: blob.type,
             });
 
             const url = "/upload/profile";
-            formData.append("supplierId", String(supplierId));
+            formData.append("supplierId", String(createdSupplier.id));
             formData.append("profile", image);
             const config = {
-              baseURL: "http://localhost:3000",
+              baseURL: "http://0.0.0.0:3000",
               headers: {
                 Accept: "application/json",
                 "Content-Type": "multipart/form-data",
@@ -346,7 +327,6 @@ function NewSupplier(): JSX.Element {
             };
 
             const responseUpload = await axios.post(url, formData, config);
-            
           } catch (err) {
             console.log(err);
           }
