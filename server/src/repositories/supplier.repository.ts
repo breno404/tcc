@@ -16,6 +16,7 @@ class SupplierRepository extends BaseRepository<Supplier> {
       where: { [Op.or]: [{ companyName: name }, { fantasyName: name }] },
     });
   }
+
 }
 
 export { SupplierRepository };

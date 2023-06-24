@@ -2,40 +2,40 @@ import { InputType, Field } from "type-graphql";
 
 @InputType()
 class CustomerInput {
-  @Field()
+  @Field(() => String, { nullable: true })
   companyName: string;
 
-  @Field()
+  @Field(() => String, { nullable: true })
   fantasyName: string;
 
-  @Field()
+  @Field(() => String, { nullable: true })
   cnae: string;
 
-  @Field()
+  @Field(() => String, { nullable: true })
   entityType: string;
 
-  @Field()
+  @Field(() => String, { nullable: true })
   cnpj: string;
 
-  @Field()
+  @Field(() => String, { nullable: true })
   cep: string;
 
-  @Field()
+  @Field(() => String, { nullable: true })
   district: string;
 
-  @Field()
+  @Field(() => String, { nullable: true })
   street: string;
 
-  @Field()
+  @Field(() => String, { nullable: true })
   streetNumber: string;
 
-  @Field()
+  @Field(() => String, { nullable: true })
   city: string;
 
-  @Field()
+  @Field(() => String, { nullable: true })
   phone: string;
 
-  @Field()
+  @Field(() => String, { nullable: true })
   email: string;
 }
 

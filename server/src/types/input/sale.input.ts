@@ -2,19 +2,19 @@ import { InputType, Field } from "type-graphql";
 
 @InputType()
 class SaleInput {
-  @Field()
+  @Field(() => String, { nullable: true })
   saleDate: string;
 
-  @Field()
+  @Field(() => String, { nullable: true })
   productId: string;
 
-  @Field()
+  @Field(() => Number, { nullable: true })
   price: number;
 
-  @Field()
+  @Field(() => Number, { nullable: true })
   quantity: number;
 
-  @Field()
+  @Field(() => String, { nullable: true })
   customerId: string;
 }
 

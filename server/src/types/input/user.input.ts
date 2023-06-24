@@ -2,19 +2,19 @@ import { InputType, Field } from "type-graphql";
 
 @InputType()
 class UserInput {
-  @Field()
+  @Field(() => String, { nullable: true })
   name!: string;
 
-  @Field()
+  @Field(() => String, { nullable: true })
   userName!: string;
 
-  @Field()
+  @Field(() => String, { nullable: true })
   email!: string;
 
-  @Field()
+  @Field(() => String, { nullable: true })
   phone!: string;
 
-  @Field()
+  @Field(() => String, { nullable: true })
   password!: string;
 }
 

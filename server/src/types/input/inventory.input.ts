@@ -2,10 +2,10 @@ import { InputType, Field } from "type-graphql";
 
 @InputType()
 class InventoryInput {
-  @Field()
-  productId: number;
+  @Field(() => String, { nullable: true })
+  productId: string;
   
-  @Field()
+  @Field(() => Number, { nullable: true })
   quantity: number;
 }
 

@@ -29,7 +29,7 @@ const modelAttributes: ModelAttributes<
   Optional<UserAttributes, never>
 > = {
   id: {
-    type: DataTypes.UUIDV4,
+    type: DataTypes.STRING,
     primaryKey: true,
     defaultValue: uuidv4(),
     allowNull: false,

@@ -22,14 +22,16 @@ abstract class BaseRepository<T extends Model> implements IRepository<T> {
   }
 
   async update(id: string, entity: { [key in keyof Attributes<T>]?: Fn | Col | Literal | Attributes<T>[key] | undefined; }): Promise<[number, T[]]> {
-    return this.model.update(entity, {
-      where: { attribute: { ["id"]: id } },
+    console.log(id)
+    console.log(entity)
+    return this.model.update({...entity}, {
+      where: {  id  },
       returning: true,
     });
   }
 
   async delete(id: string): Promise<number> {
-    return this.model.destroy({ where: { attribute: { ["id"]: id } } });
+    return this.model.destroy({ where: { attribute: { id } } });
   }
 }
 

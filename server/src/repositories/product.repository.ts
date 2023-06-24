@@ -32,6 +32,8 @@ class ProductRepository extends BaseRepository<Product> {
     };
     if (inventory) {
       response.quantity = inventory.quantity;
+    }else{
+      response.quantity = 0
     }
 
     return response;

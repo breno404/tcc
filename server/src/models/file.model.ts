@@ -23,7 +23,7 @@ const modelAttributes: ModelAttributes<
   Optional<FileAttributes, never>
 > = {
   id: {
-    type: DataTypes.UUIDV4,
+    type: DataTypes.STRING,
     primaryKey: true,
     defaultValue: uuidv4(),
     allowNull: false,

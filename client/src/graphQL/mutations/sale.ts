@@ -9,7 +9,7 @@ export const createSale = (fields: SaleAttribute[]) => gql`
   `;
 
 export const deleteSale = (fields: SaleAttribute[]) => gql`
-    mutation DeleteSale($id: String) {
+    mutation DeleteSale($id: String!) {
       deleteSale(id: $id) {
         ${fields.join("\n")}
       }

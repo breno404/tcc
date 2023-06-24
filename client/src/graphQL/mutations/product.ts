@@ -9,7 +9,7 @@ export const createProduct = (fields: ProductAttribute[]) => gql`
   `;
 
 export const updateProduct = (fields: ProductAttribute[]) => gql`
-    mutation UpdateProduct($id: String, $data: ProductInput!) {
+    mutation UpdateProduct($id: String!, $data: ProductInput!) {
       updateProduct(data: $data, id: $id) {
         ${fields.join("\n")}
       }

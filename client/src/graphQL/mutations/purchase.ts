@@ -9,7 +9,7 @@ export const createPurchase = (fields: PurchaseAttribute[]) => gql`
   `;
 
 export const deletePurchase = (fields: PurchaseAttribute[]) => gql`
-    mutation DeletePurchase($id: String) {
+    mutation DeletePurchase($id: String!) {
       deletePurchase(id: $id) {
         ${fields.join("\n")}
       }

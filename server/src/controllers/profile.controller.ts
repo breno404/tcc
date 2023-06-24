@@ -6,7 +6,7 @@ import UserService from "../services/user.service";
 import CustomerService from "../services/customer.service";
 import SupplierService from "../services/supplier.service";
 
-abstract class ProfileController {
+class ProfileController {
   static async getProfileImageFromUserById(req: Request, res: Response) {
     const userId: string = req.body.userId;
     res.send("File");

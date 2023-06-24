@@ -26,7 +26,7 @@ const modelAttributes: ModelAttributes<
   Optional<SaleAttributes, never>
 > = {
   id: {
-    type: DataTypes.UUIDV4,
+    type: DataTypes.STRING,
     primaryKey: true,
     defaultValue: uuidv4(),
     allowNull: false,

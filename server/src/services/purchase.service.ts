@@ -49,7 +49,7 @@ class PurchaseService implements ISubject {
   async createPurchase(attributes: PurchaseInput): Promise<PurchaseType | null> {
     const id = uuid()
     try {
-      const purchase = await this.purchaseRepository.create({id,...attributes});
+      const purchase = await this.purchaseRepository.createAndUpdateInventory(id,{...attributes});
       if (!purchase) throw Error(`Something went wrong during purchase creation`);
       return purchase;
     } catch (err) {

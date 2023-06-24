@@ -57,7 +57,7 @@ class CustomerService implements ISubject {
   async createCustomer(attributes): Promise<CustomerType | null> {
     const id = uuid()
     try {
-      const customer = await this.customerRepository.create({...attributes,id });
+      const customer = await this.customerRepository.create({ ...attributes, id });
       if (!customer)
         throw Error(`Something went wrong during customer creation`);
       return customer;

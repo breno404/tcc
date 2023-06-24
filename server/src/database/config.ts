@@ -33,7 +33,7 @@ const options: Options = {
   snowflake: undefined,
   sqlite: {
     dialect: "sqlite",
-    storage: path.resolve(__dirname, "..", "..", "storage", "database.sqlite"), logging: false,
+    storage: path.resolve(__dirname, "..", "..", "storage", "database.sqlite"), logging: true,
     dialectOptions: {
       useUTC: false,
     },
