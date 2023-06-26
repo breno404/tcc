@@ -16,9 +16,10 @@ import {
   updateUser as userMutation,
 } from "@/graphQL/index";
 import { useQuery, useMutation } from "@apollo/client";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import axios, { AxiosRequestConfig } from "axios";
 import PasswordInput from "@/components/inputs/PasswordInput";
+import toast, { Toaster } from "react-hot-toast";
 
 const Style = styled.div`
   display: flex;
@@ -162,6 +163,7 @@ const Profile = (props: ProfileProps) => {
 
 function UpdateUser(): JSX.Element {
   const { id } = useParams();
+  const navigate = useNavigate();
   const { data: response } = useQuery(
     userQuery(["id", "userName", "name", "email", "phone"]),
     {
@@ -171,9 +173,8 @@ function UpdateUser(): JSX.Element {
     }
   );
 
-  const [mutation, { data: updatedUser,error:updatedUserError }] = useMutation(
-    userMutation(["id", "name", "userName", "phone", "email"])
-  );
+  const [mutation, { data: updatedUser, error: updatedUserError }] =
+    useMutation(userMutation(["id", "name", "userName", "phone", "email"]));
   //------------------------------------------------------------
   const [profileImage, setProfileImage] = useState("");
   const [userName, setUserName] = useState("");
@@ -182,6 +183,32 @@ function UpdateUser(): JSX.Element {
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+
+  useEffect(() => {
+    if (id)
+      axios
+        .get("/upload/profile/user", {
+          baseURL: "http://localhost:3000",
+          params: { userId: id },
+          headers: {
+            Authorization: "Bearer token",
+          },
+        })
+        .then((response) => {
+          console.log(response);
+          if (response.status >= 200 && response.status < 300) {
+            let partialUrl = response.data.path.substring(
+              response.data.path.indexOf("uploads")
+            );
+            partialUrl = partialUrl.replaceAll("\\", "/");
+            partialUrl =
+              "http://localhost:3000/" + partialUrl.replaceAll("//", "/");
+
+            console.log(partialUrl);
+            setProfileImage(partialUrl);
+          }
+        });
+  }, [id]);
 
   useMemo(() => {
     const user = response?.user;
@@ -263,41 +290,56 @@ function UpdateUser(): JSX.Element {
 
       if (password === confirmPassword || (!password && !confirmPassword)) {
         valid = true;
+      } else {
+        toast.error('O campo "Senha" e "Confirmar senha" devem ser iguais.');
       }
 
       if (!validName || !validEmail || !validUserName || !validPhone) {
+        if (!validName)
+          toast.error('Por favor corrija o campo a seguir "Nome".');
+        else if (!validEmail)
+          toast.error('Por favor corrija o campo a seguir "Email".');
+        else if (!validUserName)
+          toast.error('Por favor corrija o campo a seguir "Usuário".');
+        else if (!validPhone)
+          toast.error('Por favor corrija o campo a seguir "Telefone".');
         valid = false;
       }
 
       if (valid) {
         (async () => {
-          mutation({
+          const updateUserResponse = await mutation({
             variables: {
+              id,
               data: {
                 userName,
                 name,
                 email,
                 phone,
+                password,
               },
             },
           });
-
           try {
-
-            if (!updatedUserError) {
+            if (updateUserResponse?.data && profileImage) {
               const formData = new FormData();
               const blob = await (await fetch(profileImage)).blob();
-              const filename = `profile-${id}.${blob.type.split("/")[1]}`;
+              const filename = `profile-${
+                updateUserResponse?.data?.updateUser.id
+              }.${blob.type.split("/")[1]}`;
               const image = new File([blob], filename, {
                 lastModified: new Date().getTime(),
                 type: blob.type,
               });
 
               const url = "/upload/profile/user";
-              formData.append("userId", String(id));
+              formData.append(
+                "userId",
+                String(updateUserResponse?.data?.updateUser.id)
+              );
               formData.append("profile", image);
               const config = {
-                baseURL: "http://0.0.0.0:3000",
+                baseURL: "http://localhost:3000",
                 headers: {
                   Accept: "application/json",
                   "Content-Type": "multipart/form-data",
@@ -306,8 +348,15 @@ function UpdateUser(): JSX.Element {
               };
 
               const responseUpload = await axios.post(url, formData, config);
+
+              if (responseUpload.status >= 200 && responseUpload.status < 300) {
+                toast.success("Usuário atualizado com sucesso!");
+              }
+            } else if (updateUserResponse?.data) {
+              toast.success("Usuário atualizado com sucesso!");
             }
           } catch (err) {
+            toast.error("Um erro ocorreu ao salvar o usuário!");
             console.log(err);
           }
         })();
@@ -320,6 +369,7 @@ function UpdateUser(): JSX.Element {
 
   return (
     <>
+      <Toaster containerStyle={{ fontSize: "1.4rem" }} />
       <Breadcrumb />
       <Style>
         <div>

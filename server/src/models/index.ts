@@ -24,5 +24,11 @@ Sale.belongsTo(Customer);
 User.belongsToMany(File, { through: 'files_users' });
 File.belongsToMany(User, { through: 'files_users' });
 
+Supplier.belongsToMany(File, { through: 'files_suppliers' });
+File.belongsToMany(Supplier, { through: 'files_suppliers' });
+
+Customer.belongsToMany(File, { through: 'files_customers' });
+File.belongsToMany(Customer, { through: 'files_customers' });
+
 
 export { User, Customer, File, Inventory, Product, Supplier };

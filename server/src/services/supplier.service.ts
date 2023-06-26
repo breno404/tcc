@@ -1,6 +1,8 @@
 import { SupplierRepository } from "../repositories/supplier.repository";
 import { Supplier as SupplierType } from "../types/object/supplier.type";
+import { Supplier, File } from '../models/index'
 import LoggerService from "./logger.service"; import { v4 as uuid } from 'uuid'
+import moment from "moment";
 
 class SupplierService implements ISubject {
   private observers: IObserver[];
@@ -80,7 +82,26 @@ class SupplierService implements ISubject {
     return Boolean(deletedRows);
   }
 
-  syncProfileImageById(supplierId: any, destPath: string) { }
+  async syncProfileImageById(supplierId: any, destPath: string) {
+    const id = uuid()
+    const separatePath = destPath.split('/')
+    const nameAndExt = separatePath.at(separatePath.length - 1)?.split('.')
+
+    try {
+      const supplier = await Supplier.findByPk(supplierId);
+      if (supplier) {
+        const file = await File.create({ id, path: destPath, ext: String(nameAndExt?.at(1)), name: String(nameAndExt?.at(0)), lastModified: moment(new Date()).toDate() })
+
+        await file.setSuppliers([supplier]); // Associa o arquivo ao usuário
+
+        console.log('Arquivo criado e associado ao fornecedor com sucesso!');
+      } else {
+        console.log('Fornecedor não encontrado!');
+      }
+    } catch (error) {
+      console.log('Erro ao criar e associar o arquivo:', error);
+    }
+  }
   deleteProfileImage(supplierId: any) { }
 }
 

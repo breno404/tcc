@@ -3,6 +3,7 @@ import { UserInput } from "../types/input/user.input";
 import { User as UserType } from "../types/object/user.type";
 import UserService from "../services/user.service";
 import LoggerService from "../services/logger.service";
+import bcrypt from 'bcrypt'
 
 @Resolver(UserType)
 class UserResolver {
@@ -31,7 +32,10 @@ class UserResolver {
     data: UserInput
   ): Promise<UserType | null> {
     const service = new UserService();
-    return service.createUser(data);
+    const salt = await bcrypt.genSalt(1000)
+    const hashedPassword = await bcrypt.hash(data.password, salt)
+    const user = await service.createUser({ ...data, password: hashedPassword });
+    return user
   }
 
   @Mutation(() => UserType)
@@ -40,7 +44,20 @@ class UserResolver {
     @Arg("data", { validate: { forbidUnknownValues: false } }) data: UserInput
   ): Promise<UserType | null> {
     const service = new UserService();
-    return service.updateUser(id, data);
+    if (data.password) {
+
+      const saltRounds = 10
+
+      const hashedPassword = await bcrypt.hash(data.password, saltRounds)
+
+      const user = await service.updateUser(id, { ...data, password: hashedPassword });
+
+      return user
+    } else {
+      const user = await service.updateUser(id, data);
+
+      return user
+    }
   }
 
   @Mutation(() => Boolean)

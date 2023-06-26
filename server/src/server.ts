@@ -14,6 +14,7 @@ import { ProductResolver } from "./resolvers/product.resolver";
 import { PurchaseResolver } from "./resolvers/purchase.resolver";
 import { SaleResolver } from "./resolvers/sale.resolver";
 import authMiddleware from "./middlewares/authenticate.middleware";
+import path from 'path'
 import authenticateRouter from "./routers/authenticate.router";
 //import config from "@/config/config";
 
@@ -41,9 +42,13 @@ export default async function init() {
 
   const app = express();
   app.use(cors());
+  app.use(express.static('../uploads'));
   app.use(helmet());
   app.use("/authenticate", authenticateRouter);
   app.use("/upload", uploadRouter);
+  app.get(/uploads(\/\w)+/, (req, res) => {
+    res.sendFile(path.join(__dirname, '..', req.path))
+  })
   const server = new ApolloServer({
     // context: ({ req }) => {
     //   return authMiddleware(req);

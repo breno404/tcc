@@ -122,13 +122,13 @@ const Button = ({ backgroundColor, label, onClick }: ButtonProps) => {
 function Purchase(): JSX.Element {
   //------------------------------------------------------------
   const { data: productsResponse } = useQuery(productsQuery(["id", "name"]));
-  const [product, setProduct] = useState(0);
+  const [product, setProduct] = useState("");
   const [value, setValue] = useState("");
   const [quantity, setQuantity] = useState("");
   const { data: suppliersResponse } = useQuery(
     suppliersQuery(["id", "companyName"])
   );
-  const [supplier, setSupplier] = useState(0);
+  const [supplier, setSupplier] = useState("");
   const [date, setDate] = useState("");
   const [mutation, { data: createdPurchase, error: createPurchaseError }] =
     useMutation(
@@ -151,7 +151,7 @@ function Purchase(): JSX.Element {
   });
 
   const handleChangeProductCallBack = (value: string) => {
-    setProduct(Number(value));
+    setProduct(value);
   };
   const handleChangeValueCallBack = (value: string) => {
     setValue(value);
@@ -160,7 +160,7 @@ function Purchase(): JSX.Element {
     setQuantity(value);
   };
   const handleChangeSupplierCallBack = (value: string) => {
-    setSupplier(Number(value));
+    setSupplier(value);
   };
   const handleChangeDateCallBack = (value: string) => {
     setDate(value);
@@ -170,10 +170,10 @@ function Purchase(): JSX.Element {
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
     event.preventDefault();
-    setProduct(0);
+    setProduct("");
     setValue("");
     setQuantity("");
-    setSupplier(0);
+    setSupplier("");
     setDate("");
   };
 
@@ -182,10 +182,10 @@ function Purchase(): JSX.Element {
       event.preventDefault();
       let valid = true;
 
-      let validProduct = product > 0;
+      let validProduct = !!product;
       let validValue = Number(value.replaceAll(",", ".")) > 0;
       let validQuantity = Number(quantity.replaceAll(",", ".")) > 0;
-      let validSupplier = supplier > 0;
+      let validSupplier = !!supplier;
       let validDate = validate.exists(date);
 
       if (
@@ -244,11 +244,13 @@ function Purchase(): JSX.Element {
                           handleChangeProductCallBack(value);
                         }}
                       >
-                        <option value="0">--</option>
+                        <option value="">--</option>
                         {productsResponse?.products &&
                           productsResponse?.products.length > 0 &&
                           productsResponse?.products.map((p: any) => (
-                            <option value={p.id}>{p.name}</option>
+                            <option value={p.id} key={"product-" + p.id}>
+                              {p.name}
+                            </option>
                           ))}
                       </select>
                     </label>
@@ -268,11 +270,13 @@ function Purchase(): JSX.Element {
                           handleChangeSupplierCallBack(value);
                         }}
                       >
-                        <option value="0">--</option>
+                        <option value="">--</option>
                         {suppliersResponse?.suppliers &&
                           suppliersResponse?.suppliers.length > 0 &&
                           suppliersResponse?.suppliers.map((s: any) => (
-                            <option value={s.id}>{s.companyName}</option>
+                            <option value={s.id} key={"supplier-" + s.id}>
+                              {s.companyName}
+                            </option>
                           ))}
                       </select>
                     </label>

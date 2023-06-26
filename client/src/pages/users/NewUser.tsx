@@ -4,6 +4,7 @@ import profileImgDefault from "@/assets/profile.webp";
 import {
   ChangeEvent,
   ChangeEventHandler,
+  MouseEvent,
   MouseEventHandler,
   useCallback,
   useEffect,
@@ -79,7 +80,7 @@ const StyledButton = styled.button<{
 type ButtonProps = {
   backgroundColor: "default" | "transparent";
   label: string;
-  onClick: MouseEventHandler<HTMLButtonElement>;
+  onClick: any;
 };
 
 const Button = ({ backgroundColor, label, onClick }: ButtonProps) => {
@@ -215,7 +216,7 @@ function NewUser(): JSX.Element {
   };
 
   const handleSubmitData = useCallback(
-    (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    (event: MouseEvent<HTMLButtonElement, MouseEvent>) => {
       event.preventDefault();
       let valid = true;
 
@@ -239,6 +240,8 @@ function NewUser(): JSX.Element {
       }
 
       if (password !== confirmPassword) {
+        console.log(password);
+        console.log(confirmPassword);
         valid = false;
       }
 
@@ -246,33 +249,41 @@ function NewUser(): JSX.Element {
         valid = false;
       }
 
-      if (valid) {
-        mutation({
-          variables: {
-            data: {
-              userName,
-              name,
-              email,
-              phone,
-            },
-          },
-        });
+      console.log(validEmail);
+      console.log(validUserName);
+      console.log(validName);
+      console.log(validPhone);
+      console.log(validPassword);
+      console.log(valid);
 
+      if (valid) {
         (async () => {
+          const createdUserReponse = await mutation({
+            variables: {
+              data: {
+                userName,
+                name,
+                email,
+                phone,
+                password,
+              },
+            },
+          });
+
           try {
-            if (createdUser.data) {
+            if (createdUserReponse?.data) {
               const formData = new FormData();
               const blob = await (await fetch(profileImage)).blob();
-              const filename = `profile-${createdUser.data?.id}.${
-                blob.type.split("/")[1]
-              }`;
+              const filename = `profile-${
+                createdUserReponse.data?.createUser?.id
+              }.${blob.type.split("/")[1]}`;
               const image = new File([blob], filename, {
                 lastModified: new Date().getTime(),
                 type: blob.type,
               });
 
               const url = "/upload/profile/user";
-              formData.append("userId", String(createdUser.data?.id));
+              formData.append("userId", String(createdUserReponse.data?.createUser?.id));
               formData.append("profile", image);
               const config = {
                 baseURL: "http://localhost:3000",
@@ -293,7 +304,7 @@ function NewUser(): JSX.Element {
         console.log("Corrija alguns campos antes de enviar a requisição.");
       }
     },
-    [profileImage, userName, name, email, phone, password]
+    [profileImage, userName, name, email, phone, password, confirmPassword]
   );
 
   return (

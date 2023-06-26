@@ -5,11 +5,18 @@ import path from "path";
 import UserService from "../services/user.service";
 import CustomerService from "../services/customer.service";
 import SupplierService from "../services/supplier.service";
+import { File, User } from '../models'
 
 class ProfileController {
   static async getProfileImageFromUserById(req: Request, res: Response) {
-    const userId: string = req.body.userId;
-    res.send("File");
+    const userId: string = String(req.query.userId);
+
+    if (userId) {
+      const file = await File.findOne({ attributes: ['path'], include: { model: User, where: { id: userId }, required: true, attributes: ["id", "name"] } })
+      res.send(file)
+    } else {
+      res.status(400).send()
+    }
   }
 
   static async uploadProfileImageToUserById(req: Request, res: Response) {
@@ -24,7 +31,7 @@ class ProfileController {
 
     const userService = new UserService();
     const uploadService = new UploadService(
-      path.resolve(__dirname, "../", "../", "uploads", userId)
+      path.resolve(__dirname, "../", "../", profile.destination)
     );
     const user = await userService.findUserById(userId);
 
@@ -42,7 +49,10 @@ class ProfileController {
         user.profile?.path as string
       );
       destPath = await uploadService.upload(profileStream, oldProfileStream);
+
+      oldProfileStream.close()
     } else destPath = await uploadService.upload(profileStream);
+    profileStream.close()
 
     await userService.syncProfileImageById(userId, destPath);
 
@@ -75,7 +85,7 @@ class ProfileController {
 
     const customerService = new CustomerService();
     const uploadService = new UploadService(
-      path.resolve(__dirname, "../", "../", "uploads", customerId)
+      path.resolve(__dirname, "../", "../", profile.destination)
     );
     const customer = await customerService.findCustomerById(customerId);
 
@@ -126,7 +136,7 @@ class ProfileController {
 
     const supplierService = new SupplierService();
     const uploadService = new UploadService(
-      path.resolve(__dirname, "../", "../", "uploads", supplierId)
+      path.resolve(__dirname, "../", "../", profile.destination)
     );
     const supplier = await supplierService.findSupplierById(supplierId);
 
@@ -144,7 +154,11 @@ class ProfileController {
         supplier.profile?.path as string
       );
       destPath = await uploadService.upload(profileStream, oldProfileStream);
-    } else destPath = await uploadService.upload(profileStream);
+
+    } else {
+      destPath = await uploadService.upload(profileStream);
+
+    }
 
     await supplierService.syncProfileImageById(supplierId, destPath);
 

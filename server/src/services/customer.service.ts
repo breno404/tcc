@@ -2,7 +2,8 @@ import { CustomerRepository } from "../repositories/customer.repository";
 import { Customer as CustomerType } from "../types/object/customer.type";
 import { v4 as uuid } from 'uuid'
 import LoggerService from "./logger.service";
-import { Customer } from "../models";
+import { Customer, File } from "../models";
+import moment from "moment";
 
 class CustomerService implements ISubject {
   private observers: IObserver[];
@@ -82,7 +83,26 @@ class CustomerService implements ISubject {
     return Boolean(deletedRows);
   }
 
-  syncProfileImageById(customerId: any, destPath: string) { }
+  async syncProfileImageById(customerId: any, destPath: string) {
+    const id = uuid()
+    const separatePath = destPath.split('/')
+    const nameAndExt = separatePath.at(separatePath.length - 1)?.split('.')
+
+    try {
+      const customer = await Customer.findByPk(customerId);
+      if (customer) {
+        const file = await File.create({ id, path: destPath, ext: String(nameAndExt?.at(1)), name: String(nameAndExt?.at(0)), lastModified: moment(new Date()).toDate() })
+
+        await file.setCustomers([customer]); // Associa o arquivo ao usuário
+
+        console.log('Arquivo criado e associado ao cliente com sucesso!');
+      } else {
+        console.log('Cliente não encontrado!');
+      }
+    } catch (error) {
+      console.log('Erro ao criar e associar o arquivo:', error);
+    }
+  }
   deleteProfileImage(customerId: any) { }
 }
 

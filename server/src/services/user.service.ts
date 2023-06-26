@@ -1,10 +1,13 @@
+import moment from "moment";
+import { File, User } from "../models";
 import { UserRepository } from "../repositories/user.repository";
 import { User as UserType } from "../types/object/user.type";
-import LoggerService from "./logger.service"; 
+import LoggerService from "./logger.service";
 import { v4 as uuid } from 'uuid'
+import { sequelize } from "../database/config";
 
 class UserService implements ISubject {
-  private observers: IObserver[];
+  private observers: IObserver[] = [];
 
   registerObserver(observer: IObserver): void {
     throw new Error("Method not implemented.");
@@ -63,6 +66,7 @@ class UserService implements ISubject {
   ): Promise<UserType | null> {
     await this.userRepository.update(id, attributes);
     const user = await this.userRepository.findById(id);
+
     if (!user) return null;
     return user.toJSON();
   }
@@ -72,8 +76,25 @@ class UserService implements ISubject {
     return Boolean(deletedRows);
   }
 
-  syncProfileImageById(userId: any, destPath: string) {
+  async syncProfileImageById(userId: any, destPath: string) {
+    const id = uuid()
+    const separatePath = destPath.split('/')
+    const nameAndExt = separatePath.at(separatePath.length - 1)?.split('.')
 
+    try {
+      const user = await User.findByPk(userId);
+      if (user) {
+        const file = await File.create({ id, path: destPath, ext: String(nameAndExt?.at(1)), name: String(nameAndExt?.at(0)), lastModified: moment(new Date()).toDate() })
+
+        await file.setUsers([user]); // Associa o arquivo ao usuário
+
+        console.log('Arquivo criado e associado ao usuário com sucesso!');
+      } else {
+        console.log('Usuário não encontrado!');
+      }
+    } catch (error) {
+      console.log('Erro ao criar e associar o arquivo:', error);
+    }
   }
   deleteProfileImage(userId: any) {
 

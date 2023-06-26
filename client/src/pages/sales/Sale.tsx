@@ -247,7 +247,9 @@ function Sale(): JSX.Element {
                         {productsResponse?.products &&
                           productsResponse?.products.length > 0 &&
                           productsResponse?.products.map((p: any) => (
-                            <option value={p.id}>{p.name}</option>
+                            <option value={p.id} key={"product-" + p.id}>
+                              {p.name}
+                            </option>
                           ))}
                       </select>
                     </label>
@@ -270,8 +272,10 @@ function Sale(): JSX.Element {
                         <option value="">--</option>
                         {customersResponse?.customers &&
                           customersResponse?.customers.length > 0 &&
-                          customersResponse?.customers.map((s: any) => (
-                            <option value={s.id}>{s.companyName}</option>
+                          customersResponse?.customers.map((c: any) => (
+                            <option value={c.id} key={"costumer-" + c.id}>
+                              {c.companyName}
+                            </option>
                           ))}
                       </select>
                     </label>

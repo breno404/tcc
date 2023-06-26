@@ -48,6 +48,24 @@ CREATE TABLE
     );
 
 CREATE TABLE
+    files_suppliers (
+        fileId VARCHAR(255) NOT NULL,
+        supplierId VARCHAR(255) NOT NULL,
+        PRIMARY KEY (fileId, supplierId),
+        FOREIGN KEY (fileId) REFERENCES files (id),
+        FOREIGN KEY (supplierId) REFERENCES suppliers (id)
+    );
+
+CREATE TABLE
+    files_customers (
+        fileId VARCHAR(255) NOT NULL,
+        customerId VARCHAR(255) NOT NULL,
+        PRIMARY KEY (fileId, customerId),
+        FOREIGN KEY (fileId) REFERENCES files (id),
+        FOREIGN KEY (customerId) REFERENCES customers (id)
+    );
+
+CREATE TABLE
     customers (
         id VARCHAR(255) NOT NULL,
         companyName VARCHAR(255),
@@ -82,8 +100,6 @@ CREATE TABLE
         email VARCHAR(255) DEFAULT NULL,
         PRIMARY KEY (id)
     );
-
-    
 
 CREATE TABLE
     products (
