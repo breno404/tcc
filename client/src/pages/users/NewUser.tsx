@@ -17,6 +17,7 @@ import TextInput from "@/components/inputs/TextInput";
 import validate from "@/helpers/validate";
 import { createUser as createUserMutation } from "@/graphQL/index";
 import { useMutation } from "@apollo/client";
+import useToken from "@/hooks/useToken";
 
 const Style = styled.div`
   display: flex;
@@ -159,6 +160,7 @@ const Profile = (props: ProfileProps) => {
 };
 
 function NewUser(): JSX.Element {
+  const token = useToken()
   const [profileImage, setProfileImage] = useState("");
   const [userName, setUserName] = useState("");
   const [name, setName] = useState("");
@@ -290,7 +292,7 @@ function NewUser(): JSX.Element {
                 headers: {
                   Accept: "application/json",
                   "Content-Type": "multipart/form-data",
-                  Authorization: "Bearer token",
+                  Authorization: `Bearer ${token}`,
                 },
               };
 

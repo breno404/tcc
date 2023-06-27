@@ -20,6 +20,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import axios, { AxiosRequestConfig } from "axios";
 import PasswordInput from "@/components/inputs/PasswordInput";
 import toast, { Toaster } from "react-hot-toast";
+import useToken from "@/hooks/useToken";
 
 const Style = styled.div`
   display: flex;
@@ -162,6 +163,7 @@ const Profile = (props: ProfileProps) => {
 };
 
 function UpdateUser(): JSX.Element {
+  const token = useToken()
   const { id } = useParams();
   const navigate = useNavigate();
   const { data: response } = useQuery(
@@ -191,7 +193,7 @@ function UpdateUser(): JSX.Element {
           baseURL: "http://localhost:3000",
           params: { userId: id },
           headers: {
-            Authorization: "Bearer token",
+            Authorization: `Bearer ${token}`,
           },
         })
         .then((response) => {
@@ -343,7 +345,7 @@ function UpdateUser(): JSX.Element {
                 headers: {
                   Accept: "application/json",
                   "Content-Type": "multipart/form-data",
-                  Authorization: "Bearer token",
+                  Authorization: `Bearer ${token}`,
                 },
               };
 

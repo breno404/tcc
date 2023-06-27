@@ -37,8 +37,8 @@ class AuthController {
         try {
             const token = await AuthController.loginUser(email, password)
 
-            res.json({token})
-        }   
+            res.json({ token })
+        }
         catch (err) {
             res.json({ err })
         }

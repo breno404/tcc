@@ -16,6 +16,7 @@ import { createSupplier as supplierMutation } from "@/graphQL/index";
 import { useParams } from "react-router-dom";
 import axios, { AxiosRequestConfig } from "axios";
 import { useMutation } from "@apollo/client";
+import useToken from "@/hooks/useToken";
 
 const Style = styled.div`
   display: flex;
@@ -165,6 +166,7 @@ const CNPJCEPSection = styled.section`
 `;
 
 function NewSupplier(): JSX.Element {
+  const token = useToken()
   //------------------------------------------------------------
   const [profileImage, setProfileImage] = useState("");
   const [companyName, setCompanyName] = useState("");
@@ -180,8 +182,9 @@ function NewSupplier(): JSX.Element {
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
 
-  const [mutation, { data: createdSupplier, loading, error }] =
-    useMutation(supplierMutation(["id", "companyName", "cnpj"]));
+  const [mutation, { data: createdSupplier, loading, error }] = useMutation(
+    supplierMutation(["id", "companyName", "cnpj"])
+  );
 
   const handleChangeProfileCallBack = useCallback(
     (photo: File | null) => {
@@ -302,38 +305,44 @@ function NewSupplier(): JSX.Element {
               email,
             },
           },
-        }).then((createdSupplier) => {
-          alert('Fornecedor salvo com sucesso!')
-          try {
-            (async () => {
-              const formData = new FormData();
-              const blob = await (await fetch(profileImage)).blob();
-              const filename = `profile-${createdSupplier.data?.id}.${
-                blob.type.split("/")[1]
-              }`;
-              const image = new File([blob], filename, {
-                lastModified: new Date().getTime(),
-                type: blob.type,
-              });
+        })
+          .then((createdSupplier) => {
+            alert("Fornecedor salvo com sucesso!");
+            try {
+              (async () => {
+                const formData = new FormData();
+                const blob = await (await fetch(profileImage)).blob();
+                const filename = `profile-${createdSupplier.data?.id}.${
+                  blob.type.split("/")[1]
+                }`;
+                const image = new File([blob], filename, {
+                  lastModified: new Date().getTime(),
+                  type: blob.type,
+                });
 
-              const url = "/upload/profile/supplier";
-              formData.append("supplierId", String(createdSupplier.data?.id));
-              formData.append("profile", image);
-              const config = {
-                baseURL: "http://localhost:3000",
-                headers: {
-                  Accept: "application/json",
-                  "Content-Type": "multipart/form-data",
-                  Authorization: "Bearer token",
-                },
-              };
+                const url = "/upload/profile/supplier";
+                formData.append("supplierId", String(createdSupplier.data?.id));
+                formData.append("profile", image);
+                const config = {
+                  baseURL: "http://localhost:3000",
+                  headers: {
+                    Accept: "application/json",
+                    "Content-Type": "multipart/form-data",
+                    Authorization: `Bearer ${token}`,
+                  },
+                };
 
-              const responseUpload = await axios.post(url, formData, config);
-            })();
-          } catch (err) {
-            console.log(err);
-          }
-        }).catch(()=> {alert('Um erro ocorreu durante a criação do fornecedor, por favor tente mais tarde')})
+                const responseUpload = await axios.post(url, formData, config);
+              })();
+            } catch (err) {
+              console.log(err);
+            }
+          })
+          .catch(() => {
+            alert(
+              "Um erro ocorreu durante a criação do fornecedor, por favor tente mais tarde"
+            );
+          });
       } else {
         console.log("Corrija alguns campos antes de enviar a requisição.");
       }

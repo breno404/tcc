@@ -16,6 +16,7 @@ import { createCustomer as createCustomerMutation } from "@/graphQL/index";
 import { useParams } from "react-router-dom";
 import axios, { AxiosRequestConfig } from "axios";
 import { useMutation } from "@apollo/client";
+import useToken from "@/hooks/useToken";
 
 const Style = styled.div`
   display: flex;
@@ -183,6 +184,7 @@ type CustomerQueryResponse = {
 };
 
 function NewCustomer(): JSX.Element {
+  const token = useToken()
   //------------------------------------------------------------
   const [profileImage, setProfileImage] = useState("");
   const [companyName, setCompanyName] = useState("");
@@ -319,38 +321,47 @@ function NewCustomer(): JSX.Element {
               email,
             },
           },
-        }).then((createdCustomer) => {
-          alert('Cliente salvo com sucesso!')
-          try {
-            (async () => {
-              const formData = new FormData();
-              const blob = await (await fetch(profileImage)).blob();
-              const filename = `profile-${createdCustomer.data?.id}.${
-                blob.type.split("/")[1]
-              }`;
-              const image = new File([blob], filename, {
-                lastModified: new Date().getTime(),
-                type: blob.type,
-              });
+        })
+          .then((createdCustomer) => {
+            alert("Cliente salvo com sucesso!");
+            try {
+              (async () => {
+                const formData = new FormData();
+                const blob = await (await fetch(profileImage)).blob();
+                const filename = `profile-${createdCustomer.data?.id}.${
+                  blob.type.split("/")[1]
+                }`;
+                const image = new File([blob], filename, {
+                  lastModified: new Date().getTime(),
+                  type: blob.type,
+                });
 
-              const url = "/upload/customer";
-              formData.append("customerId", String(createdCustomer.data?.id));
-              formData.append("profile", image);
-              const config = {
-                baseURL: "http://localhost:3000",
-                headers: {
-                  Accept: "application/json",
-                  "Content-Type": "multipart/form-data",
-                  Authorization: "Bearer token",
-                },
-              };
+                const url = "/upload/customer";
+                formData.append("customerId", String(createdCustomer.data?.id));
+                formData.append("profile", image);
+                const config = {
+                  baseURL: "http://localhost:3000",
+                  headers: {
+                    Accept: "application/json",
+                    "Content-Type": "multipart/form-data",
+                    Authorization: `Bearer ${token}`,
+                  },
+                };
 
-              const responseUpload = await axios.post(url, formData, config);
-            })();
-          } catch (err) {
-            console.log(err);
-          }
-        }).catch(()=> {alert('Um erro ocorreu durante a criação do cliente, por favor tente mais tarde')})
+                if(token){
+                  const responseUpload = await axios.post(url, formData, config);
+                }
+                
+              })();
+            } catch (err) {
+              console.log(err);
+            }
+          })
+          .catch(() => {
+            alert(
+              "Um erro ocorreu durante a criação do cliente, por favor tente mais tarde"
+            );
+          });
       } else {
         console.log("Corrija alguns campos antes de enviar a requisição.");
       }
@@ -369,6 +380,7 @@ function NewCustomer(): JSX.Element {
       city,
       phone,
       email,
+      token,
     ]
   );
 

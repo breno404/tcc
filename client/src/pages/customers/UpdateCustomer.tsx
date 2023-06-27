@@ -19,6 +19,8 @@ import {
 import { useParams } from "react-router-dom";
 import axios, { AxiosRequestConfig } from "axios";
 import { useMutation, useQuery } from "@apollo/client";
+import toast, { Toaster } from "react-hot-toast";
+import useToken from "@/hooks/useToken";
 
 const Style = styled.div`
   display: flex;
@@ -169,6 +171,7 @@ const CNPJCEPSection = styled.section`
 
 function UpdateCustomer(): JSX.Element {
   const { id } = useParams();
+  const token = useToken()
 
   const { data: response } = useQuery(
     customerQuery([
@@ -324,6 +327,17 @@ function UpdateCustomer(): JSX.Element {
       let validCity = validate.exists(city);
       let validPhone = validate.exists(phone);
       let validEmail = validate.exists(email);
+      console.log(
+        !validCompanyName ||
+          !validCnae ||
+          !validEntityType ||
+          !validCnpj ||
+          !validCep ||
+          !validDistrict ||
+          !validStreet ||
+          !validStreetNumber ||
+          !validCity
+      );
 
       if (
         !validCompanyName ||
@@ -358,30 +372,45 @@ function UpdateCustomer(): JSX.Element {
           };
 
           try {
-            await updateCustomer({ variables: { data, id } });
-
-            const formData = new FormData();
-            const blob = await (await fetch(profileImage)).blob();
-            const filename = `profile-${id}.${blob.type.split("/")[1]}`;
-            const image = new File([blob], filename, {
-              lastModified: new Date().getTime(),
-              type: blob.type,
+            const updateCustomerResponse = await updateCustomer({
+              variables: { data, id },
             });
 
-            const url = "/upload/profile/customer";
-            formData.append("customerId", String(id));
-            formData.append("profile", image);
-            const config = {
-              baseURL: "http://localhost:3000",
-              headers: {
-                Accept: "application/json",
-                "Content-Type": "multipart/form-data",
-                Authorization: "Bearer token",
-              },
-            };
+            if (updateCustomerResponse.data && profileImage) {
+              const formData = new FormData();
+              const blob = await (await fetch(profileImage)).blob();
+              const filename = `profile-${
+                updateCustomerResponse?.data.updateCustomer.id
+              }.${blob.type.split("/")[1]}`;
+              const image = new File([blob], filename, {
+                lastModified: new Date().getTime(),
+                type: blob.type,
+              });
 
-            const responseUpload = await axios.post(url, formData, config);
+              const url = "/upload/profile/customer";
+              formData.append(
+                "customerId",
+                String(updateCustomerResponse?.data.updateCustomer.id)
+              );
+              formData.append("profile", image);
+              const config = {
+                baseURL: "http://localhost:3000",
+                headers: {
+                  Accept: "application/json",
+                  "Content-Type": "multipart/form-data",
+                  Authorization: `Bearer ${token}`,
+                },
+              };
+
+              const responseUpload = await axios.post(url, formData, config);
+              if (responseUpload.status >= 200 && responseUpload.status < 300) {
+                toast.success("Cliente atualizado com sucesso!");
+              }
+            } else {
+              toast.success("Cliente atualizado com sucesso!");
+            }
           } catch (err) {
+            toast.error("Erro ao atualizar o cliente.");
             console.log(err);
           }
         })();
@@ -392,22 +421,22 @@ function UpdateCustomer(): JSX.Element {
     [
       profileImage,
       companyName,
-      fantasyName,
       cnae,
       entityType,
       cnpj,
       cep,
       district,
+      email,
       street,
       streetNumber,
       city,
       phone,
-      email,
     ]
   );
 
   return (
     <>
+      <Toaster containerStyle={{ fontSize: "1.4rem" }} />
       <Breadcrumb />
       <Style>
         <div>

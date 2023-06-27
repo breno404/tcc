@@ -19,6 +19,8 @@ import {
 import { useParams } from "react-router-dom";
 import axios, { AxiosRequestConfig } from "axios";
 import { useMutation, useQuery } from "@apollo/client";
+import toast, { Toaster } from "react-hot-toast";
+import useToken from "@/hooks/useToken";
 
 const Style = styled.div`
   display: flex;
@@ -167,25 +169,8 @@ const CNPJCEPSection = styled.section`
   }
 `;
 
-type SupplierQueryResponse = {
-  supplier: {
-    id?: string;
-    companyName?: string;
-    fantasyName?: string;
-    cnae?: string;
-    entityType?: string;
-    cnpj?: string;
-    cep?: string;
-    district?: string;
-    street?: string;
-    streetNumber?: string;
-    city?: string;
-    phone?: string;
-    email?: string;
-  };
-};
-
 function UpdateSupplier(): JSX.Element {
+  const token = useToken()
   const { id } = useParams();
 
   const { data: response } = useQuery(
@@ -342,6 +327,17 @@ function UpdateSupplier(): JSX.Element {
       let validCity = validate.exists(city);
       let validPhone = validate.exists(phone);
       let validEmail = validate.exists(email);
+      console.log(
+        !validCompanyName ||
+          !validCnae ||
+          !validEntityType ||
+          !validCnpj ||
+          !validCep ||
+          !validDistrict ||
+          !validStreet ||
+          !validStreetNumber ||
+          !validCity
+      );
 
       if (
         !validCompanyName ||
@@ -376,30 +372,45 @@ function UpdateSupplier(): JSX.Element {
           };
 
           try {
-            await updateSupplier({ variables: { data, id } });
-
-            const formData = new FormData();
-            const blob = await (await fetch(profileImage)).blob();
-            const filename = `profile-${id}.${blob.type.split("/")[1]}`;
-            const image = new File([blob], filename, {
-              lastModified: new Date().getTime(),
-              type: blob.type,
+            const updateSupplierResponse = await updateSupplier({
+              variables: { data, id },
             });
 
-            const url = "/upload/profile/supplier";
-            formData.append("supplierId", String(id));
-            formData.append("profile", image);
-            const config = {
-              baseURL: "http://localhost:3000",
-              headers: {
-                Accept: "application/json",
-                "Content-Type": "multipart/form-data",
-                Authorization: "Bearer token",
-              },
-            };
+            if (updateSupplierResponse.data && profileImage) {
+              const formData = new FormData();
+              const blob = await (await fetch(profileImage)).blob();
+              const filename = `profile-${
+                updateSupplierResponse?.data.updateSupplier.id
+              }.${blob.type.split("/")[1]}`;
+              const image = new File([blob], filename, {
+                lastModified: new Date().getTime(),
+                type: blob.type,
+              });
 
-            const responseUpload = await axios.post(url, formData, config);
+              const url = "/upload/profile/supplier";
+              formData.append(
+                "supplierId",
+                String(updateSupplierResponse?.data.updateSupplier.id)
+              );
+              formData.append("profile", image);
+              const config = {
+                baseURL: "http://localhost:3000",
+                headers: {
+                  Accept: "application/json",
+                  "Content-Type": "multipart/form-data",
+                  Authorization: `Bearer ${token}`,
+                },
+              };
+
+              const responseUpload = await axios.post(url, formData, config);
+              if (responseUpload.status >= 200 && responseUpload.status < 300) {
+                toast.success("Fornecedor atualizado com sucesso!");
+              }
+            } else {
+              toast.success("Fornecedor atualizado com sucesso!");
+            }
           } catch (err) {
+            toast.error("Erro ao atualizar o fornecedor.");
             console.log(err);
           }
         })();
@@ -410,22 +421,22 @@ function UpdateSupplier(): JSX.Element {
     [
       profileImage,
       companyName,
-      fantasyName,
       cnae,
       entityType,
       cnpj,
       cep,
       district,
+      email,
       street,
       streetNumber,
       city,
       phone,
-      email,
     ]
   );
 
   return (
     <>
+      <Toaster containerStyle={{ fontSize: "1.4rem" }} />
       <Breadcrumb />
       <Style>
         <div>
@@ -495,13 +506,13 @@ function UpdateSupplier(): JSX.Element {
                     value={email}
                     onChangeCallBack={handleChangeEmailCallBack}
                   />
-                  <PhoneInput
+                  <TextInput
                     id="phone"
                     name="phone"
                     htmlFor="phone"
                     label="Telefone"
                     value={phone}
-                    type="tel"
+                    type="text"
                     onChangeCallBack={handleChangePhoneCallBack}
                   />
                 </section>

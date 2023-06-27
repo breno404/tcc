@@ -2,7 +2,6 @@ import Breadcrumb from "@/components/Breadcrumb";
 import { useNavigate } from "react-router-dom";
 import Table from "@/components/Table";
 import styled from "styled-components";
-import useGraphQL from "@/hooks/useGraphQL";
 import { suppliers as suppliersQuery } from "@/graphQL/index";
 import { useCallback, useEffect, useMemo } from "react";
 import AddUserIcon from "@/assets/AddUserIcon.svg";

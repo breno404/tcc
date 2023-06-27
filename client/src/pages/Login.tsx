@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
-import {useNavigate} from 'react-router-dom'
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const Container = styled.div`
   display: flex;
@@ -57,11 +58,13 @@ const Container = styled.div`
 `;
 
 function Login() {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   return (
     <Container>
       <div>
-        <form action="" method="post" >
+        <form action="" method="post">
           <div
             style={{
               flexDirection: "column",
@@ -78,21 +81,60 @@ function Login() {
             <div>
               <fieldset>
                 <label htmlFor="email">E-mail</label>
-                <input type="text" id="email" name="email" />
+                <input
+                  type="text"
+                  id="email"
+                  name="email"
+                  value={email}
+                  onChange={(evt) => setEmail(evt.target.value)}
+                />
               </fieldset>
             </div>
             <div>
               <fieldset>
                 <label htmlFor="password"> Senha</label>
-                <input type="password" id="password" name="password" />
+                <input
+                  type="password"
+                  id="password"
+                  name="password"
+                  value={password}
+                  onChange={(evt) => setPassword(evt.target.value)}
+                />
               </fieldset>
             </div>
             <div>
-              <button type="submit" onClick={(evt)=>{
-                evt.preventDefault()
+              <button
+                type="submit"
+                onClick={(evt) => {
+                  evt.preventDefault();
+                  try {
+                    const formData = new FormData();
 
-                navigate('/')
-              }}>Login</button>
+                    axios
+                      .post(
+                        "/authenticate",
+                        { email, password },
+                        {
+                          baseURL: "http://localhost:3000",
+                        }
+                      )
+                      .then((response) => {
+                        if (response.status == 200) {
+                          console.log(response.data);
+                          const token = response.data.token;
+
+                          localStorage.setItem("token", token);
+
+                          navigate("/");
+                        }
+                      });
+                  } catch (err) {
+                    console.log(err);
+                  }
+                }}
+              >
+                Login
+              </button>
             </div>
           </div>
         </form>
