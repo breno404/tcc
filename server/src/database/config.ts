@@ -1,5 +1,5 @@
 import { Dialect, Options as SequelizeOptions, Sequelize } from "sequelize";
-import path from "path";
+import path from "node:path";
 
 type Options = {
   [database in Dialect]: SequelizeOptions | undefined;
@@ -46,7 +46,7 @@ const options: Options = {
   },
 };
 
-let sequelize;
+let sequelize: Sequelize;
 const isDev = String(process.env.NODE_ENV).trim() == "development" || "dev";
 if (isDev) sequelize = new Sequelize(options["sqlite"]);
 else sequelize = new Sequelize(options["mysql"]);
